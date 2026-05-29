@@ -1,0 +1,24 @@
+-- CreateTable
+CREATE TABLE `Layanan` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `kategori` VARCHAR(191) NOT NULL,
+    `urutan` INTEGER NOT NULL DEFAULT 0,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `LayananItem` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `layananId` INTEGER NOT NULL,
+    `nama` VARCHAR(191) NOT NULL,
+    `urutan` INTEGER NOT NULL DEFAULT 0,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- AddForeignKey
+ALTER TABLE `LayananItem` ADD CONSTRAINT `LayananItem_layananId_fkey` FOREIGN KEY (`layananId`) REFERENCES `Layanan`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

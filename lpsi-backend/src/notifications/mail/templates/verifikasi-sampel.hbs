@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<body style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+  <h2 style="color: #1d4ed8;">Pembaruan Verifikasi Sampel</h2>
+  <p>Yth. <strong>{{nama}}</strong>,</p>
+  <p>Terdapat pembaruan verifikasi sampel untuk permohonan <strong>{{nomorPermohonan}}</strong>:</p>
+  <table style="width:100%; border-collapse: collapse; margin: 16px 0;">
+    <tr><td style="padding: 8px; background:#f3f4f6; font-weight:bold;">Nama Sampel</td><td style="padding: 8px;">{{namaSampel}}</td></tr>
+    <tr><td style="padding: 8px; background:#f3f4f6; font-weight:bold;">Status</td><td style="padding: 8px;">{{status}}</td></tr>
+    {{#if alasanTolak}}<tr><td style="padding: 8px; background:#f3f4f6; font-weight:bold;">Alasan</td><td style="padding: 8px; color:#dc2626;">{{alasanTolak}}</td></tr>{{/if}}
+  </table>
+  {{#if ditolak}}<p>Sampel yang ditolak perlu diajukan melalui permohonan baru.</p>{{/if}}
+  <p style="font-size:12px; color:#888;">Email ini dikirim otomatis oleh sistem LPSI — BRMP Ruminansia Besar, BRIN.</p>
+</body>
+</html>

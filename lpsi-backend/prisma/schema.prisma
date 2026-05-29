@@ -1,0 +1,120 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int            @id @default(autoincrement())
+  nama          String
+  email         String         @unique
+  password      String
+  role          Role           @default(PEMOHON)
+  jenisKelamin  String?
+  tanggalLahir  DateTime?
+  isActive      Boolean        @default(false)
+  activateToken String?
+  resetToken    String?
+  createdAt     DateTime       @default(now())
+  requests      LabRequest[]
+  notifications Notification[]
+}
+
+enum Role {
+  PEMOHON
+  ADMIN
+}
+
+model LabRequest {
+  id                Int           @id @default(autoincrement())
+  nomorPermohonan   String        @unique
+  userId            Int
+  user              User          @relation(fields: [userId], references: [id])
+  namaPemohon       String
+  alamat            String
+  noHp              String
+  emailPemohon      String
+  tanggalPermohonan DateTime
+  suratPengantar    String?
+  status            RequestStatus @default(MENUNGGU_SAMPEL)
+  totalTagihan      Decimal?
+  kodeBilling       String?
+  buktiBayar        String?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  samples           Sample[]
+  ikm               IKM?
+}
+
+enum RequestStatus {
+  MENUNGGU_SAMPEL
+  SAMPEL_DITERIMA
+  VERIFIKASI
+  MENUNGGU_PEMBAYARAN
+  LUNAS
+  ON_PROGRESS
+  SELESAI
+}
+
+model Sample {
+  id          Int          @id @default(autoincrement())
+  requestId   Int
+  request     LabRequest   @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  kategori    String
+  namaSampel  String
+  beratBasah  Float?
+  beratKering Float?
+  kemasan     String?
+  jenisUji    Json
+  hargaTotal  Decimal
+  status      SampleStatus @default(MENUNGGU)
+  alasanTolak String?
+  lhpFile     String?
+  createdAt   DateTime     @default(now())
+}
+
+enum SampleStatus {
+  MENUNGGU
+  DITERIMA
+  OK
+  DITOLAK
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model Layanan {
+  id        Int           @id @default(autoincrement())
+  kategori  String
+  urutan    Int           @default(0)
+  items     LayananItem[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+}
+
+model LayananItem {
+  id        Int      @id @default(autoincrement())
+  layananId Int
+  layanan   Layanan  @relation(fields: [layananId], references: [id], onDelete: Cascade)
+  nama      String
+  urutan    Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+model IKM {
+  id        Int        @id @default(autoincrement())
+  requestId Int        @unique
+  request   LabRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  jawaban   Json
+  createdAt DateTime   @default(now())
+}
