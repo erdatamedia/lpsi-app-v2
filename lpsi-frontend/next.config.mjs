@@ -5,7 +5,11 @@ const nextConfig = {
       {
         protocol: 'http',
         hostname: 'localhost',
-        port: '3001',
+        pathname: '/uploads/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'lpsi.brmprb.site',
         pathname: '/uploads/**',
       },
       {
