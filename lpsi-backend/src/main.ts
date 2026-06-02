@@ -13,13 +13,19 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   app.useGlobalFilters(new AllExceptionsFilter());
 
-  const allowedOrigins = [
-    process.env.APP_URL,
-    'http://localhost:3000',
-  ].filter(Boolean);
-
   app.enableCors({
-    origin: allowedOrigins,
+    origin: (origin, callback) => {
+      // Allow production URL, all localhost ports (dev), and no-origin (curl/mobile)
+      if (
+        !origin ||
+        origin === process.env.APP_URL ||
+        /^http:\/\/localhost:\d+$/.test(origin)
+      ) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     credentials: true,
   });
 

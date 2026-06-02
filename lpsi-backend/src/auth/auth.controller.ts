@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Query, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, Res, UseGuards } from '@nestjs/common';
 import type { Response } from 'express';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
@@ -6,16 +6,10 @@ import { LoginDto } from './dto/login.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { IsEmail } from 'class-validator';
-import { IsNotEmpty } from 'class-validator';
 
 class ForgotPasswordDto {
   @IsEmail()
   email: string;
-}
-
-class ActivateDto {
-  @IsNotEmpty()
-  token: string;
 }
 
 @Controller('auth')
@@ -25,11 +19,6 @@ export class AuthController {
   @Post('register')
   register(@Body() dto: RegisterDto) {
     return this.authService.register(dto);
-  }
-
-  @Post('activate')
-  activate(@Body() dto: ActivateDto) {
-    return this.authService.activate(dto.token);
   }
 
   @Post('login')

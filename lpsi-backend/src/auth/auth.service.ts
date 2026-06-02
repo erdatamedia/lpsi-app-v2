@@ -28,48 +28,29 @@ export class AuthService {
     if (existing) throw new BadRequestException('Email sudah terdaftar');
 
     const hash = await bcrypt.hash(dto.password, 12);
-    const token = uuidv4();
 
-    const user = await this.prisma.user.create({
+    await this.prisma.user.create({
       data: {
         nama: dto.nama,
         email: dto.email,
         password: hash,
         jenisKelamin: dto.jenisKelamin,
         tanggalLahir: dto.tanggalLahir ? new Date(dto.tanggalLahir) : undefined,
-        activateToken: token,
+        // isActive: false by default — aktivasi manual oleh admin
       },
     });
 
-    const activationUrl = `${this.config.get('APP_URL')}/aktivasi?token=${token}`;
-    try {
-      await this.mailer.sendMail({
-        to: user.email,
-        subject: 'Aktivasi Akun LPSI',
-        template: 'activation',
-        context: { nama: user.nama, activationUrl },
-      });
-    } catch {}
-
-    return { statusCode: 201, message: 'Registrasi berhasil. Cek email untuk aktivasi akun.' };
-  }
-
-  async activate(token: string) {
-    const user = await this.prisma.user.findFirst({ where: { activateToken: token } });
-    if (!user) throw new BadRequestException('Token aktivasi tidak valid');
-
-    await this.prisma.user.update({
-      where: { id: user.id },
-      data: { isActive: true, activateToken: null },
-    });
-
-    return { statusCode: 200, message: 'Akun berhasil diaktivasi. Silakan login.' };
+    return {
+      statusCode: 201,
+      message: 'Registrasi berhasil. Akun Anda sedang menunggu verifikasi oleh admin. Harap menunggu maksimal 1x24 jam.',
+    };
   }
 
   async login(dto: LoginDto) {
     const user = await this.prisma.user.findUnique({ where: { email: dto.email } });
     if (!user) throw new UnauthorizedException('Email atau password salah');
-    if (!user.isActive) throw new UnauthorizedException('Akun belum diaktivasi');
+    if (!user.isActive)
+      throw new UnauthorizedException('Akun belum diaktivasi. Harap menunggu verifikasi admin.');
 
     const valid = await bcrypt.compare(dto.password, user.password);
     if (!valid) throw new UnauthorizedException('Email atau password salah');

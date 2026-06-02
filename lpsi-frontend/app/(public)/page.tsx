@@ -1,109 +1,163 @@
+'use client';
+
 import Link from 'next/link';
+import Image from 'next/image';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { ClipboardList, FlaskConical, CreditCard, FileDown, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
+import { Slideshow } from '@/components/Slideshow';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
-const steps = [
-  { icon: ClipboardList, title: 'Ajukan Permohonan', desc: 'Isi formulir online dan daftarkan sampel yang akan diuji.' },
-  { icon: FlaskConical, title: 'Kirim Sampel', desc: 'Kirim sampel fisik ke laboratorium sesuai petunjuk.' },
-  { icon: CreditCard, title: 'Pembayaran PNBP', desc: 'Terima kode billing dan lakukan pembayaran sesuai tagihan.' },
-  { icon: FileDown, title: 'Unduh LHP', desc: 'Isi IKM dan unduh Laporan Hasil Pengujian secara online.' },
-];
+interface Slide { id: number; imageUrl: string; caption?: string; }
+interface CardMedia { id: number; type: string; fileUrl: string; }
+interface LayananItem { id: number; nama: string; }
+interface Layanan { id: number; kategori: string; items: LayananItem[]; }
 
-const highlights = [
-  'Permohonan 100% online',
-  'Tracking status real-time',
-  'Laporan digital terverifikasi',
-  'Notifikasi email otomatis',
+const cards = [
+  {
+    key: 'layanan',
+    label: 'Layanan Pengujian',
+    desc: 'Lihat daftar layanan uji dan mulai pengajuan permohonan.',
+    color: 'from-blue-600 to-blue-700',
+    href: '/register',
+    isLink: true,
+  },
+  {
+    key: 'HARGA_LAYANAN',
+    label: 'Daftar Harga Layanan',
+    desc: 'Informasi tarif PNBP untuk setiap jenis pengujian.',
+    color: 'from-green-600 to-green-700',
+    isLink: false,
+  },
+  {
+    key: 'ALUR_LAYANAN',
+    label: 'Alur Layanan',
+    desc: 'Tata cara dan prosedur pengajuan permohonan pengujian.',
+    color: 'from-purple-600 to-purple-700',
+    isLink: false,
+  },
+  {
+    key: 'DOKUMEN_ISO',
+    label: 'Dokumen ISO',
+    desc: 'Dokumen mutu dan sertifikasi laboratorium.',
+    color: 'from-orange-500 to-orange-600',
+    isLink: false,
+  },
 ];
 
 export default function HomePage() {
+  const [slides, setSlides] = useState<Slide[]>([]);
+  const [cardMedia, setCardMedia] = useState<CardMedia[]>([]);
+  const [layanan, setLayanan] = useState<Layanan[]>([]);
+
+  const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001/api';
+  const BASE = API.replace('/api', '');
+
+  useEffect(() => {
+    fetch(`${API}/content/slides`).then(r => r.json()).then(d => setSlides(d.data ?? [])).catch(() => {});
+    fetch(`${API}/content/card-media`).then(r => r.json()).then(d => setCardMedia(d.data ?? [])).catch(() => {});
+    fetch(`${API}/layanan`).then(r => r.json()).then(d => setLayanan(d.data ?? [])).catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  function getCardMediaUrl(type: string): string | null {
+    const found = cardMedia.find(c => c.type === type);
+    return found ? `${BASE}${found.fileUrl}` : null;
+  }
+
   return (
-    <div className="min-h-screen flex flex-col bg-white">
-      <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-slate-100 px-5 py-3.5 flex justify-between items-center">
+    <div className="min-h-screen flex flex-col bg-white dark:bg-slate-950">
+      {/* Navbar */}
+      <nav className="sticky top-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur border-b border-slate-100 dark:border-slate-800 px-5 py-3.5 flex justify-between items-center">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
-            <FlaskConical size={16} className="text-white" />
-          </div>
+          <Image src="/logo.png" alt="LPSI Logo" width={36} height={36} className="object-contain" />
           <div>
-            <span className="font-bold text-slate-900 text-base leading-none block">LPSI</span>
-            <span className="text-slate-400 text-xs hidden sm:block">BRMP Ruminansia Besar</span>
+            <span className="font-bold text-slate-900 dark:text-white text-base leading-none block">LPSI</span>
+            <span className="text-slate-400 text-xs hidden sm:block">Layanan Pelacakan Hasil Lab</span>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Link href="/layanan" className="hidden sm:block text-sm text-slate-600 hover:text-slate-900 px-3 py-1.5 rounded-md hover:bg-slate-50 transition-colors">Layanan</Link>
-          <Link href="/alur" className="hidden sm:block text-sm text-slate-600 hover:text-slate-900 px-3 py-1.5 rounded-md hover:bg-slate-50 transition-colors">Alur</Link>
+          <ThemeToggle />
           <Button asChild variant="ghost" size="sm"><Link href="/login">Masuk</Link></Button>
           <Button asChild size="sm" className="bg-blue-600 hover:bg-blue-700 text-white"><Link href="/register">Daftar</Link></Button>
         </div>
       </nav>
 
-      <section className="bg-gradient-to-br from-slate-900 via-blue-950 to-blue-900 text-white py-20 sm:py-28 px-5">
-        <div className="max-w-3xl mx-auto text-center animate-slide-up">
-          <span className="inline-block bg-blue-500/20 border border-blue-400/30 text-blue-200 text-xs font-semibold uppercase tracking-widest px-4 py-1.5 rounded-full mb-6">
-            LPSI — Layanan Pelacakan Hasil Lab
-          </span>
-          <h1 className="text-4xl sm:text-5xl font-extrabold leading-tight mb-5 text-white">
-            Layanan Pengujian Lab<br className="hidden sm:block" /> Kini Sepenuhnya Online
-          </h1>
-          <p className="text-blue-100 text-lg sm:text-xl mb-8 max-w-2xl mx-auto">
-            Ajukan permohonan, pantau status analisis, dan unduh laporan hasil pengujian — tanpa perlu datang ke lab.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Button asChild size="lg" className="bg-blue-500 hover:bg-blue-400 text-white font-semibold px-8 h-12">
-              <Link href="/register">Mulai Sekarang <ArrowRight size={16} className="ml-1.5" /></Link>
-            </Button>
-            <Button asChild size="lg" className="bg-transparent border border-white/50 text-white hover:bg-white/10 h-12 px-8">
-              <Link href="/alur">Lihat Alur Pengujian</Link>
-            </Button>
-          </div>
-        </div>
-        <div className="mt-14 max-w-2xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-3 animate-slide-up-delay-2">
-          {highlights.map((h) => (
-            <div key={h} className="flex items-center gap-2 bg-white/10 rounded-lg px-3 py-2.5">
-              <CheckCircle2 size={15} className="text-green-400 shrink-0" />
-              <span className="text-xs text-blue-100 font-medium">{h}</span>
-            </div>
-          ))}
-        </div>
-      </section>
+      {/* Slideshow */}
+      <Slideshow slides={slides} />
 
-      <section className="py-16 sm:py-20 px-5 bg-slate-50">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900">Alur Pengujian</h2>
-            <p className="text-slate-500 mt-2">Empat langkah mudah dari permohonan hingga laporan</p>
+      {/* 4 Cards */}
+      <section className="py-14 sm:py-20 px-5 bg-slate-50 dark:bg-slate-900">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-10">
+            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">Informasi Laboratorium</h2>
+            <p className="text-slate-500 dark:text-slate-400 mt-2 text-sm">Akses informasi layanan, harga, dan dokumen resmi laboratorium</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {steps.map(({ icon: Icon, title, desc }, i) => (
-              <div key={i} className="bg-white rounded-xl p-5 border border-slate-100 shadow-sm card-hover">
-                <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center mb-4">
-                  <Icon size={19} className="text-blue-600" />
+            {cards.map((card) => {
+              const mediaUrl = card.isLink ? null : getCardMediaUrl(card.key);
+              const content = (
+                <div className={`bg-gradient-to-br ${card.color} rounded-2xl p-6 text-white shadow-md card-hover h-full flex flex-col justify-between min-h-[180px] cursor-pointer`}>
+                  <div>
+                    <h3 className="font-bold text-base sm:text-lg mb-2">{card.label}</h3>
+                    <p className="text-white/80 text-sm leading-relaxed">{card.desc}</p>
+                  </div>
+                  <div className="mt-4 flex items-center gap-1 text-white/90 text-xs font-semibold">
+                    {card.isLink ? 'Mulai Daftar' : mediaUrl ? 'Lihat Dokumen' : 'Belum tersedia'}
+                    <ArrowRight size={13} />
+                  </div>
                 </div>
-                <span className="text-xs font-bold text-blue-600 uppercase tracking-wide">Langkah {i + 1}</span>
-                <h3 className="font-bold text-slate-900 mt-1 mb-1.5 text-sm">{title}</h3>
-                <p className="text-xs text-slate-500 leading-relaxed">{desc}</p>
-              </div>
-            ))}
-          </div>
-          <div className="text-center mt-8">
-            <Link href="/alur" className="text-sm text-blue-600 hover:text-blue-700 font-medium inline-flex items-center gap-1 hover:underline">
-              Lihat alur lengkap <ArrowRight size={14} />
-            </Link>
+              );
+
+              if (card.isLink) {
+                return <Link key={card.key} href={card.href!} className="block">{content}</Link>;
+              }
+              if (mediaUrl) {
+                return (
+                  <a key={card.key} href={mediaUrl} target="_blank" rel="noopener noreferrer" className="block">
+                    {content}
+                  </a>
+                );
+              }
+              return <div key={card.key} className="opacity-60">{content}</div>;
+            })}
           </div>
         </div>
       </section>
 
-      <section className="py-14 px-5">
-        <div className="max-w-lg mx-auto bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl p-8 text-center text-white shadow-lg">
-          <h2 className="text-xl font-bold mb-2">Sudah punya akun?</h2>
-          <p className="text-blue-100 text-sm mb-5">Masuk untuk memantau status dan mengunduh laporan.</p>
-          <Button asChild className="bg-white text-blue-700 hover:bg-blue-50 font-semibold px-8">
-            <Link href="/login">Masuk ke Portal</Link>
-          </Button>
-        </div>
-      </section>
+      {/* Layanan */}
+      {layanan.length > 0 && (
+        <section className="py-14 sm:py-20 px-5 bg-white dark:bg-slate-950">
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-10">
+              <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">Layanan Pengujian</h2>
+              <p className="text-slate-500 dark:text-slate-400 mt-2 text-sm">Parameter uji yang tersedia di laboratorium kami</p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {layanan.map((l) => (
+                <div key={l.id} className="bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700 p-5">
+                  <h3 className="font-bold text-slate-900 dark:text-white text-sm mb-3 pb-2 border-b border-slate-200 dark:border-slate-700">{l.kategori}</h3>
+                  <ul className="space-y-1.5">
+                    {l.items.map((item) => (
+                      <li key={item.id} className="flex items-start gap-2 text-sm text-slate-600 dark:text-slate-300">
+                        <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0 mt-1.5" />
+                        {item.nama}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+            <div className="text-center mt-8">
+              <Button asChild className="bg-blue-600 hover:bg-blue-700 text-white px-8">
+                <Link href="/register">Ajukan Permohonan <ArrowRight size={15} className="ml-1.5" /></Link>
+              </Button>
+            </div>
+          </div>
+        </section>
+      )}
 
-      <footer className="border-t py-6 px-5 text-center text-xs text-slate-400 mt-auto">
+      <footer className="border-t dark:border-slate-800 py-6 px-5 text-center text-xs text-slate-400 mt-auto">
         © {new Date().getFullYear()} LPSI — Layanan Pelacakan Hasil Lab
       </footer>
     </div>

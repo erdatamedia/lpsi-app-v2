@@ -42,11 +42,15 @@ model LabRequest {
   status            RequestStatus @default(MENUNGGU_SAMPEL)
   totalTagihan      Decimal?
   kodeBilling       String?
+  eBillingFile      String?
   buktiBayar        String?
+  kirimLhpFisik     Boolean?
+  resiLhp           String?
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
   samples           Sample[]
   ikm               IKM?
+  activityLogs      ActivityLog[]
 }
 
 enum RequestStatus {
@@ -109,6 +113,36 @@ model LayananItem {
   nama      String
   urutan    Int      @default(0)
   createdAt DateTime @default(now())
+}
+
+model Slide {
+  id        Int      @id @default(autoincrement())
+  imageUrl  String
+  caption   String?
+  urutan    Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model CardMedia {
+  id      Int           @id @default(autoincrement())
+  type    CardMediaType @unique
+  fileUrl String
+}
+
+enum CardMediaType {
+  HARGA_LAYANAN
+  ALUR_LAYANAN
+  DOKUMEN_ISO
+}
+
+model ActivityLog {
+  id         Int        @id @default(autoincrement())
+  requestId  Int
+  request    LabRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  action     String
+  keterangan String     @db.Text
+  createdAt  DateTime   @default(now())
 }
 
 model IKM {

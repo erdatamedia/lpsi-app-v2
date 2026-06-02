@@ -1,18 +1,21 @@
 'use client';
 
 import Link from 'next/link';
+import NextImage from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import api from '@/lib/api';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from '@/components/ThemeToggle';
-import { LayoutDashboard, FileText, LayoutList, LogOut, Menu, X, FlaskConical } from 'lucide-react';
+import { LayoutDashboard, FileText, LayoutList, Image, LogOut, Menu, X, Users } from 'lucide-react';
 
 const navItems = [
   { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/admin/permohonan', label: 'Permohonan', icon: FileText },
+  { href: '/admin/akun', label: 'Kelola Akun', icon: Users },
   { href: '/admin/layanan', label: 'Layanan', icon: LayoutList },
+  { href: '/admin/konten', label: 'Konten', icon: Image },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -36,9 +39,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       sidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full',
     )}>
       <div className="p-5 border-b border-slate-800 flex items-center gap-3">
-        <div className="w-8 h-8 rounded-lg bg-blue-500 flex items-center justify-center shrink-0">
-          <FlaskConical size={16} className="text-white" />
-        </div>
+        <NextImage src="/logo.png" alt="LPSI Logo" width={34} height={34} className="object-contain shrink-0" />
         <div>
           <h1 className="font-bold text-base text-white leading-none">LPSI</h1>
           <p className="text-xs text-slate-400 mt-0.5">Panel Admin</p>
@@ -86,9 +87,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <Menu size={20} />
           </button>
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded bg-blue-500 flex items-center justify-center">
-              <FlaskConical size={12} className="text-white" />
-            </div>
+            <NextImage src="/logo.png" alt="LPSI Logo" width={24} height={24} className="object-contain" />
             <span className="font-bold text-white text-sm">LPSI Admin</span>
           </div>
           <ThemeToggle className="ml-auto text-slate-400 hover:bg-slate-800 hover:text-white" />

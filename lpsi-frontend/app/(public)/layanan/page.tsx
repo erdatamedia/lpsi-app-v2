@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { FlaskConical, ArrowRight, MapPin, Clock, Package, Loader2 } from 'lucide-react';
+import Image from 'next/image';
+import { ArrowRight, MapPin, Clock, Package, Loader2 } from 'lucide-react';
 import api from '@/lib/api';
 
 interface LayananItem { id: number; nama: string; }
@@ -34,9 +35,7 @@ export default function LayananPage() {
     <div className="min-h-screen flex flex-col bg-white dark:bg-slate-950">
       <nav className="sticky top-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur border-b border-slate-100 dark:border-slate-800 px-5 py-3.5 flex justify-between items-center">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
-            <FlaskConical size={16} className="text-white" />
-          </div>
+          <Image src="/logo.png" alt="LPSI Logo" width={34} height={34} className="object-contain" />
           <Link href="/" className="font-bold text-slate-900 dark:text-white">LPSI</Link>
         </div>
         <div className="flex items-center gap-2">

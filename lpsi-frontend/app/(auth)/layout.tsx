@@ -1,15 +1,15 @@
 import Link from 'next/link';
-import { FlaskConical } from 'lucide-react';
+import Image from 'next/image';
 import { ThemeToggle } from '@/components/ThemeToggle';
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950">
       <div className="px-5 py-4 flex items-center gap-2.5">
-        <div className="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center">
-          <FlaskConical size={14} className="text-white" />
-        </div>
-        <Link href="/" className="font-bold text-slate-900 dark:text-white text-sm">LPSI</Link>
+        <Link href="/" className="flex items-center gap-2.5">
+          <Image src="/logo.png" alt="LPSI Logo" width={32} height={32} className="object-contain" />
+          <span className="font-bold text-slate-900 dark:text-white text-sm">LPSI</span>
+        </Link>
         <div className="ml-auto">
           <ThemeToggle />
         </div>

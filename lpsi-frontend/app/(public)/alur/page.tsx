@@ -1,6 +1,7 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { FlaskConical, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 const steps = [
   {
@@ -59,9 +60,7 @@ export default function AlurPage() {
     <div className="min-h-screen flex flex-col bg-white">
       <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-slate-100 px-5 py-3.5 flex justify-between items-center">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
-            <FlaskConical size={16} className="text-white" />
-          </div>
+          <Image src="/logo.png" alt="LPSI Logo" width={34} height={34} className="object-contain" />
           <Link href="/" className="font-bold text-slate-900">LPSI</Link>
         </div>
         <div className="flex items-center gap-2">

@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   Res,
   UploadedFile,
@@ -57,10 +58,15 @@ export class RequestsController {
     }),
   )
   create(
-    @Body() dto: CreateRequestDto,
+    @Body() body: Record<string, string>,
     @CurrentUser() user: User,
     @UploadedFile() file?: Express.Multer.File,
   ) {
+    // samples dikirim sebagai JSON string dari FormData
+    const dto: CreateRequestDto = {
+      ...body,
+      samples: typeof body.samples === 'string' ? JSON.parse(body.samples) : body.samples,
+    } as CreateRequestDto;
     return this.requestsService.create(dto, user, file?.filename);
   }
 
@@ -83,6 +89,16 @@ export class RequestsController {
   }
 
   @Roles('PEMOHON')
+  @Patch(':id/kirim-lhp')
+  setKirimLhp(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: User,
+    @Body('kirim') kirim: boolean,
+  ) {
+    return this.requestsService.setKirimLhpFisik(id, user, kirim);
+  }
+
+  @Roles('PEMOHON')
   @Post(':id/ikm')
   submitIkm(
     @Param('id', ParseIntPipe) id: number,
@@ -90,6 +106,26 @@ export class RequestsController {
     @Body() body: object,
   ) {
     return this.requestsService.submitIkm(id, user, body);
+  }
+
+  @Get(':id/logs')
+  getLogs(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: User) {
+    return this.requestsService.getLogs(id, user);
+  }
+
+  @Roles('PEMOHON')
+  @Get(':id/ebilling')
+  async downloadEbilling(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: User,
+    @Res() res: Response,
+  ) {
+    const request = await this.prisma.labRequest.findUnique({ where: { id } });
+    if (!request) throw new NotFoundException('Permohonan tidak ditemukan');
+    if (request.userId !== user.id) throw new ForbiddenException('Akses ditolak');
+    if (!request.eBillingFile) throw new NotFoundException('File e-billing belum tersedia');
+    const uploadDir = this.config.get<string>('UPLOAD_DIR') ?? './uploads';
+    return res.sendFile(request.eBillingFile, { root: join(process.cwd(), uploadDir) });
   }
 
   @Roles('PEMOHON')

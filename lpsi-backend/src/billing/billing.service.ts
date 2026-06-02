@@ -1,15 +1,17 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { NotificationsService } from '../notifications/notifications.service';
+import { ActivityLogService } from '../activity-log/activity-log.service';
 
 @Injectable()
 export class BillingService {
   constructor(
     private prisma: PrismaService,
     private notifications: NotificationsService,
+    private activityLog: ActivityLogService,
   ) {}
 
-  async inputBilling(id: number, kodeBilling: string, totalTagihan: number) {
+  async inputBilling(id: number, kodeBilling: string, totalTagihan: number, eBillingFile?: string) {
     const request = await this.prisma.labRequest.findUnique({
       where: { id },
       include: { user: { select: { nama: true, email: true } } },
@@ -20,8 +22,19 @@ export class BillingService {
 
     const updated = await this.prisma.labRequest.update({
       where: { id },
-      data: { kodeBilling, totalTagihan, status: 'MENUNGGU_PEMBAYARAN' },
+      data: {
+        kodeBilling,
+        totalTagihan,
+        status: 'MENUNGGU_PEMBAYARAN',
+        ...(eBillingFile ? { eBillingFile } : {}),
+      },
     });
+
+    await this.activityLog.log(
+      id,
+      'BILLING_DITERBITKAN',
+      `Kode billing diterbitkan oleh admin. Kode: ${kodeBilling}, Total tagihan: Rp ${Number(totalTagihan).toLocaleString('id-ID')}.${eBillingFile ? ' File e-billing dilampirkan.' : ''}`,
+    );
 
     try {
       await this.notifications.sendWithEmail(
@@ -58,6 +71,12 @@ export class BillingService {
       where: { id },
       data: { status: 'LUNAS' },
     });
+
+    await this.activityLog.log(
+      id,
+      'PEMBAYARAN_DIKONFIRMASI',
+      'Admin mengkonfirmasi pembayaran. Status berubah menjadi Lunas.',
+    );
 
     try {
       await this.notifications.sendWithEmail(

@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { NotificationsService } from '../notifications/notifications.service';
+import { ActivityLogService } from '../activity-log/activity-log.service';
 import type { User } from '@prisma/client';
 import { CreateRequestDto } from './dto/create-request.dto';
 import { format } from 'date-fns';
@@ -15,6 +16,7 @@ export class RequestsService {
   constructor(
     private prisma: PrismaService,
     private notifications: NotificationsService,
+    private activityLog: ActivityLogService,
   ) {}
 
   private async generateNomorPermohonan(): Promise<string> {
@@ -75,6 +77,12 @@ export class RequestsService {
       include: { samples: true },
     });
 
+    await this.activityLog.log(
+      request.id,
+      'PERMOHONAN_DIBUAT',
+      `Permohonan dibuat oleh ${user.nama} dengan ${request.samples.length} sampel.${suratPengantar ? ' Surat pengantar dilampirkan.' : ''}`,
+    );
+
     try {
       await this.notifications.sendWithEmail(
         user.id,
@@ -102,6 +110,8 @@ export class RequestsService {
       data: { buktiBayar: filename },
     });
 
+    await this.activityLog.log(id, 'BUKTI_BAYAR_DIUNGGAH', 'Pemohon mengunggah bukti pembayaran. Menunggu konfirmasi admin.');
+
     try {
       await this.notifications.create(
         user.id,
@@ -111,6 +121,24 @@ export class RequestsService {
     } catch {}
 
     return { statusCode: 200, message: 'Bukti bayar berhasil diunggah', data: updated };
+  }
+
+  async setKirimLhpFisik(id: number, user: User, kirim: boolean) {
+    const request = await this.prisma.labRequest.findUnique({ where: { id } });
+    if (!request) throw new NotFoundException('Permohonan tidak ditemukan');
+    if (request.userId !== user.id) throw new ForbiddenException('Akses ditolak');
+    const data = await this.prisma.labRequest.update({
+      where: { id },
+      data: { kirimLhpFisik: kirim },
+    });
+    await this.activityLog.log(
+      id,
+      'PREFERENSI_KIRIM_LHP',
+      kirim
+        ? 'Pemohon memilih LHP dikirim secara fisik (COD).'
+        : 'Pemohon memilih LHP tidak perlu dikirim fisik (hanya digital).',
+    );
+    return { statusCode: 200, message: 'Preferensi pengiriman LHP disimpan', data };
   }
 
   async submitIkm(id: number, user: User, jawaban: object) {
@@ -128,6 +156,17 @@ export class RequestsService {
       data: { requestId: id, jawaban },
     });
 
+    await this.activityLog.log(id, 'SKM_DIISI', 'Pemohon mengisi Survei Kepuasan Masyarakat (SKM).');
+
     return { statusCode: 201, message: 'IKM berhasil disimpan', data: ikm };
+  }
+
+  async getLogs(id: number, user: User) {
+    const request = await this.prisma.labRequest.findUnique({ where: { id } });
+    if (!request) throw new NotFoundException('Permohonan tidak ditemukan');
+    if (user.role !== 'ADMIN' && request.userId !== user.id)
+      throw new ForbiddenException('Akses ditolak');
+    const logs = await this.activityLog.getByRequest(id);
+    return { statusCode: 200, message: 'Log aktivitas berhasil diambil', data: logs };
   }
 }

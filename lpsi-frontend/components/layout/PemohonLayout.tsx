@@ -1,13 +1,14 @@
 'use client';
 
 import Link from 'next/link';
+import NextImage from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import api from '@/lib/api';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from '@/components/ThemeToggle';
-import { LayoutDashboard, FileText, Bell, UserCircle, LogOut, Menu, X, FlaskConical } from 'lucide-react';
+import { LayoutDashboard, FileText, Bell, UserCircle, LogOut, Menu, X } from 'lucide-react';
 
 export default function PemohonLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -47,9 +48,7 @@ export default function PemohonLayout({ children }: { children: React.ReactNode 
       sidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full',
     )}>
       <div className="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3">
-        <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center shrink-0">
-          <FlaskConical size={16} className="text-white" />
-        </div>
+        <NextImage src="/logo.png" alt="LPSI Logo" width={34} height={34} className="object-contain shrink-0" />
         <div>
           <h1 className="font-bold text-base text-slate-900 dark:text-white leading-none">LPSI</h1>
           <p className="text-xs text-slate-400 mt-0.5">Portal Pemohon</p>
@@ -107,9 +106,7 @@ export default function PemohonLayout({ children }: { children: React.ReactNode 
             <Menu size={20} />
           </button>
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded bg-blue-600 flex items-center justify-center">
-              <FlaskConical size={12} className="text-white" />
-            </div>
+            <NextImage src="/logo.png" alt="LPSI Logo" width={24} height={24} className="object-contain" />
             <span className="font-bold text-slate-900 dark:text-white text-sm">LPSI</span>
           </div>
           {unread > 0 && (

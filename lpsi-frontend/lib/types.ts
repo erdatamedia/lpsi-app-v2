@@ -47,11 +47,14 @@ export interface LabRequest {
   noHp: string;
   emailPemohon: string;
   tanggalPermohonan: string;
-  suratPengantar?: string;
+  suratPengantar?: string | null;
   status: RequestStatus;
   totalTagihan?: number;
   kodeBilling?: string;
+  eBillingFile?: string;
   buktiBayar?: string;
+  kirimLhpFisik?: boolean | null;
+  resiLhp?: string | null;
   createdAt: string;
   updatedAt: string;
   samples: Sample[];
