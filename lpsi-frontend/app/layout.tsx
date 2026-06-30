@@ -10,9 +10,9 @@ export const metadata: Metadata = {
   title: 'LPSI — Layanan Pelacakan Hasil Lab',
   description: 'Sistem pelacakan hasil laboratorium LPSI',
   icons: {
-    icon: '/logo.png',
-    shortcut: '/logo.png',
-    apple: '/logo.png',
+    icon: '/favicon.svg',
+    shortcut: '/favicon.svg',
+    apple: '/favicon.svg',
   },
 };
 
