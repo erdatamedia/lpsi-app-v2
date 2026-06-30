@@ -50,6 +50,7 @@ export class AnalysisController {
     const filename = `surat-pengantar-${request.nomorPermohonan}.pdf`;
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `inline; filename="${filename}"`);
-    return res.sendFile(request.suratPengantar, { root: join(process.cwd(), uploadDir) });
+    const root = uploadDir.startsWith('/') ? uploadDir : join(process.cwd(), uploadDir);
+    return res.sendFile(request.suratPengantar, { root });
   }
 }

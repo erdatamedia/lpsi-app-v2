@@ -61,9 +61,10 @@ export class BillingController {
     const req = await this.prisma.labRequest.findUnique({ where: { id } });
     if (!req || !req.eBillingFile) throw new NotFoundException('File e-billing tidak ditemukan');
     const uploadDir = this.config.get<string>('UPLOAD_DIR') ?? './uploads';
+    const root = uploadDir.startsWith('/') ? uploadDir : join(process.cwd(), uploadDir);
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `inline; filename="ebilling-${req.nomorPermohonan}.pdf"`);
-    return res.sendFile(req.eBillingFile, { root: join(process.cwd(), uploadDir) });
+    return res.sendFile(req.eBillingFile, { root });
   }
 
   @Get(':id/bukti-bayar')
@@ -74,7 +75,8 @@ export class BillingController {
     const req = await this.prisma.labRequest.findUnique({ where: { id } });
     if (!req || !req.buktiBayar) throw new NotFoundException('Bukti bayar tidak ditemukan');
     const uploadDir = this.config.get<string>('UPLOAD_DIR') ?? './uploads';
+    const root = uploadDir.startsWith('/') ? uploadDir : join(process.cwd(), uploadDir);
     res.setHeader('Content-Disposition', `inline; filename="buktibayar-${req.nomorPermohonan}"`);
-    return res.sendFile(req.buktiBayar, { root: join(process.cwd(), uploadDir) });
+    return res.sendFile(req.buktiBayar, { root });
   }
 }

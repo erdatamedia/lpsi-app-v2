@@ -127,7 +127,8 @@ export class RequestsController {
     const uploadDir = this.config.get<string>('UPLOAD_DIR') ?? './uploads';
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `inline; filename="ebilling-${request.nomorPermohonan}.pdf"`);
-    return res.sendFile(request.eBillingFile, { root: join(process.cwd(), uploadDir) });
+    const root = uploadDir.startsWith('/') ? uploadDir : join(process.cwd(), uploadDir);
+    return res.sendFile(request.eBillingFile, { root });
   }
 
   @Roles('PEMOHON')
@@ -150,6 +151,7 @@ export class RequestsController {
     if (!sample || !sample.lhpFile) throw new NotFoundException('File LHP tidak ditemukan');
 
     const uploadDir = this.config.get<string>('UPLOAD_DIR') ?? './uploads';
-    return res.sendFile(sample.lhpFile, { root: join(process.cwd(), uploadDir) });
+    const root = uploadDir.startsWith('/') ? uploadDir : join(process.cwd(), uploadDir);
+    return res.sendFile(sample.lhpFile, { root });
   }
 }
