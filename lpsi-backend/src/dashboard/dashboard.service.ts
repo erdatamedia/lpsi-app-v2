@@ -29,6 +29,36 @@ export class DashboardService {
     };
   }
 
+  async getSetting(key: string) {
+    const s = await this.prisma.setting.findUnique({ where: { key } });
+    return { statusCode: 200, message: 'OK', data: s };
+  }
+
+  async updateSetting(key: string, value: string) {
+    const s = await this.prisma.setting.upsert({ where: { key }, create: { key, value }, update: { value } });
+    return { statusCode: 200, message: 'Setting berhasil diperbarui', data: s };
+  }
+
+  async getSkmPertanyaan() {
+    const data = await this.prisma.skmPertanyaan.findMany({ orderBy: { urutan: 'asc' } });
+    return { statusCode: 200, message: 'OK', data };
+  }
+
+  async createSkmPertanyaan(label: string, urutan: number) {
+    const data = await this.prisma.skmPertanyaan.create({ data: { label, urutan } });
+    return { statusCode: 201, message: 'Pertanyaan ditambahkan', data };
+  }
+
+  async updateSkmPertanyaan(id: number, label?: string, urutan?: number, isActive?: boolean) {
+    const data = await this.prisma.skmPertanyaan.update({ where: { id }, data: { label, urutan, isActive } });
+    return { statusCode: 200, message: 'Pertanyaan diperbarui', data };
+  }
+
+  async deleteSkmPertanyaan(id: number) {
+    await this.prisma.skmPertanyaan.delete({ where: { id } });
+    return { statusCode: 200, message: 'Pertanyaan dihapus' };
+  }
+
   async exportExcel(): Promise<Buffer> {
     const requests = await this.prisma.labRequest.findMany({
       include: { user: { select: { nama: true, email: true } }, samples: true },

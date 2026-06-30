@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 import api from '@/lib/api';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from '@/components/ThemeToggle';
-import { LayoutDashboard, FileText, LayoutList, Image, LogOut, Menu, X, Users } from 'lucide-react';
+import { LayoutDashboard, FileText, LayoutList, Image, LogOut, Menu, X, Users, Settings2 } from 'lucide-react';
 
 const navItems = [
   { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -16,6 +16,7 @@ const navItems = [
   { href: '/admin/akun', label: 'Kelola Akun', icon: Users },
   { href: '/admin/layanan', label: 'Layanan', icon: LayoutList },
   { href: '/admin/konten', label: 'Konten', icon: Image },
+  { href: '/admin/konfigurasi', label: 'Konfigurasi', icon: Settings2 },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

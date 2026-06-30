@@ -33,17 +33,7 @@ const sampleColor: Record<SampleStatus, string> = {
   DITOLAK: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
 };
 
-const IKM_PERTANYAAN = [
-  { key: 'p1', label: 'Kemudahan prosedur permohonan pengujian' },
-  { key: 'p2', label: 'Kesesuaian persyaratan pengujian' },
-  { key: 'p3', label: 'Kejelasan informasi layanan' },
-  { key: 'p4', label: 'Kedisiplinan dan kesopanan petugas' },
-  { key: 'p5', label: 'Kecepatan pelayanan' },
-  { key: 'p6', label: 'Keadilan dalam pelayanan' },
-  { key: 'p7', label: 'Keramahan dan kesopanan petugas' },
-  { key: 'p8', label: 'Kewajaran biaya pengujian' },
-  { key: 'p9', label: 'Kesesuaian antara biaya yang dibayarkan dan hasil pengujian' },
-];
+interface SkmPertanyaan { id: number; label: string; }
 
 const IKM_OPTIONS = [
   { value: '1', label: 'Tidak Baik' },
@@ -117,6 +107,7 @@ export default function DetailPermohonanPage() {
   const [ikmJawaban, setIkmJawaban] = useState<Record<string, string>>({});
   const [ikmSaran, setIkmSaran] = useState('');
   const [submittingIkm, setSubmittingIkm] = useState(false);
+  const [skmPertanyaan, setSkmPertanyaan] = useState<SkmPertanyaan[]>([]);
   const [eBillingUrl, setEBillingUrl] = useState<string | null>(null);
   const [loadingEbilling, setLoadingEbilling] = useState(false);
   const [logs, setLogs] = useState<ActivityLog[]>([]);
@@ -140,8 +131,11 @@ export default function DetailPermohonanPage() {
     finally { setLoadingLogs(false); }
   }
 
+  useEffect(() => {
+    fetchRequest().finally(() => setLoading(false));
+    api.get('/requests/meta/skm-pertanyaan').then(({ data }) => setSkmPertanyaan(data.data ?? [])).catch(() => {});
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => { fetchRequest().finally(() => setLoading(false)); }, [id]);
+  }, [id]);
 
   async function handleUploadBukti(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -159,7 +153,7 @@ export default function DetailPermohonanPage() {
 
   async function handleSubmitIkm(e: React.FormEvent) {
     e.preventDefault();
-    if (IKM_PERTANYAAN.some((p) => !ikmJawaban[p.key])) { toast.error('Semua pertanyaan harus dijawab'); return; }
+    if (skmPertanyaan.some((p) => !ikmJawaban[`p${p.id}`])) { toast.error('Semua pertanyaan harus dijawab'); return; }
     setSubmittingIkm(true);
     try {
       await api.post(`/requests/${id}/ikm`, { ...ikmJawaban, saran: ikmSaran });
@@ -636,10 +630,10 @@ export default function DetailPermohonanPage() {
                         <p className="text-xs text-slate-500 dark:text-slate-400">Wajib diisi sebelum dapat mengunduh LHP.</p>
                       </div>
                       <form onSubmit={handleSubmitIkm} className="space-y-4">
-                        {IKM_PERTANYAAN.map((p, i) => (
-                          <div key={p.key} className="space-y-1.5">
+                        {skmPertanyaan.map((p, i) => (
+                          <div key={p.id} className="space-y-1.5">
                             <Label className="text-xs text-slate-700 dark:text-slate-300">{i + 1}. {p.label}</Label>
-                            <Select value={ikmJawaban[p.key] ?? ''} onValueChange={(v) => setIkmJawaban((prev) => ({ ...prev, [p.key]: v as string }))}>
+                            <Select value={ikmJawaban[`p${p.id}`] ?? ''} onValueChange={(v) => setIkmJawaban((prev) => ({ ...prev, [`p${p.id}`]: v as string }))}>
                               <SelectTrigger className="h-9 text-sm dark:bg-slate-900 dark:border-slate-600 dark:text-white">
                                 <SelectValue placeholder="Pilih penilaian..." />
                               </SelectTrigger>

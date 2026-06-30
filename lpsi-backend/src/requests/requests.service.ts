@@ -21,7 +21,9 @@ export class RequestsService {
 
   private async generateNomorPermohonan(): Promise<string> {
     const now = new Date();
-    const prefix = `LPSI-${format(now, 'yyMM')}-`;
+    const setting = await this.prisma.setting.findUnique({ where: { key: 'nomorPrefix' } });
+    const appPrefix = setting?.value ?? 'LPSI';
+    const prefix = `${appPrefix}-${format(now, 'yyMM')}-`;
     const count = await this.prisma.labRequest.count({
       where: { nomorPermohonan: { startsWith: prefix } },
     });

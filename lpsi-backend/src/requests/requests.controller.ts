@@ -154,4 +154,14 @@ export class RequestsController {
     const root = uploadDir.startsWith('/') ? uploadDir : join(process.cwd(), uploadDir);
     return res.sendFile(sample.lhpFile, { root });
   }
+
+  @Roles('PEMOHON', 'ADMIN')
+  @Get('meta/skm-pertanyaan')
+  async getSkmPertanyaan() {
+    const data = await this.prisma.skmPertanyaan.findMany({
+      where: { isActive: true },
+      orderBy: { urutan: 'asc' },
+    });
+    return { statusCode: 200, message: 'OK', data };
+  }
 }

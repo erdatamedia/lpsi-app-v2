@@ -157,3 +157,15 @@ model IKM {
   jawaban   Json
   createdAt DateTime   @default(now())
 }
+
+model Setting {
+  key   String @id
+  value String
+}
+
+model SkmPertanyaan {
+  id       Int     @id @default(autoincrement())
+  label    String
+  urutan   Int     @default(0)
+  isActive Boolean @default(true)
+}
