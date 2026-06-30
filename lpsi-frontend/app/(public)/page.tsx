@@ -90,7 +90,7 @@ export default function HomePage() {
       <section className="py-14 sm:py-20 px-5 bg-slate-50 dark:bg-slate-900">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-10">
-            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">Informasi Laboratorium</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">Layanan Laboratorium BRMP Ruminansia Besar</h2>
             <p className="text-slate-500 dark:text-slate-400 mt-2 text-sm">Akses informasi layanan, harga, dan dokumen resmi laboratorium</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">

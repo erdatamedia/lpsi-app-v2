@@ -44,6 +44,7 @@ const JENIS_UJI: { label: string; harga: number }[] = [
   { label: 'Isolasi DNA-RFLP', harga: 800000 },
   { label: 'Preparasi Sampel', harga: 15000 },
   { label: 'Kadar Air 60°C', harga: 15000 },
+  { label: 'Lain-Lain', harga: 0 },
 ];
 
 interface SampleForm {
@@ -53,6 +54,7 @@ interface SampleForm {
   beratKering: string;
   kemasan: string;
   jenisUji: string[]; // array of labels
+  lainnya: string;
 }
 
 const emptySample = (): SampleForm => ({
@@ -62,11 +64,13 @@ const emptySample = (): SampleForm => ({
   beratKering: '',
   kemasan: '',
   jenisUji: [],
+  lainnya: '',
 });
 
 function hitungHarga(jenisUji: string[]): number {
   return jenisUji.reduce((total, label) => {
-    const found = JENIS_UJI.find(j => j.label === label);
+    const key = label.startsWith('Lain-Lain:') ? 'Lain-Lain' : label;
+    const found = JENIS_UJI.find(j => j.label === key);
     return total + (found?.harga ?? 0);
   }, 0);
 }
@@ -199,7 +203,9 @@ function SampleCard({
             </Label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 max-h-72 overflow-y-auto pr-1">
               {JENIS_UJI.map(j => {
-                const checked = sample.jenisUji.includes(j.label);
+                const checked = j.label === 'Lain-Lain'
+                  ? sample.jenisUji.some(v => v === 'Lain-Lain' || v.startsWith('Lain-Lain:'))
+                  : sample.jenisUji.includes(j.label);
                 return (
                   <label
                     key={j.label}
@@ -216,13 +222,25 @@ function SampleCard({
                       className="accent-blue-600 mt-0.5 shrink-0"
                     />
                     <span className="flex-1 text-slate-700 dark:text-slate-300">{j.label}</span>
-                    <span className={`shrink-0 font-medium ${checked ? 'text-blue-700 dark:text-blue-300' : 'text-slate-400'}`}>
-                      {formatRp(j.harga)}
-                    </span>
+                    {j.harga > 0 && (
+                      <span className={`shrink-0 font-medium ${checked ? 'text-blue-700 dark:text-blue-300' : 'text-slate-400'}`}>
+                        {formatRp(j.harga)}
+                      </span>
+                    )}
                   </label>
                 );
               })}
             </div>
+            {sample.jenisUji.some(v => v === 'Lain-Lain' || v.startsWith('Lain-Lain:')) && (
+              <div className="mt-2">
+                <Input
+                  placeholder="Sebutkan jenis pengujian lain-lain..."
+                  value={sample.lainnya}
+                  onChange={e => onChange('lainnya', e.target.value)}
+                  className="text-xs dark:bg-slate-900 dark:border-slate-600 dark:text-white"
+                />
+              </div>
+            )}
             {sample.jenisUji.length > 0 && (
               <div className="flex items-center justify-between pt-1 px-1">
                 <span className="text-xs text-slate-500 dark:text-slate-400">{sample.jenisUji.length} jenis uji dipilih</span>
@@ -293,7 +311,9 @@ export default function BuatPermohonanPage() {
         beratBasah: s.beratBasah ? parseFloat(s.beratBasah) : undefined,
         beratKering: s.beratKering ? parseFloat(s.beratKering) : undefined,
         kemasan: s.kemasan || undefined,
-        jenisUji: s.jenisUji,
+        jenisUji: s.jenisUji.map(v =>
+          v === 'Lain-Lain' && s.lainnya ? `Lain-Lain: ${s.lainnya}` : v
+        ),
         hargaTotal: hitungHarga(s.jenisUji),
       }));
       formData.append('samples', JSON.stringify(samplesPayload));
