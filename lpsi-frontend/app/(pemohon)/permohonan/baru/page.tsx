@@ -264,6 +264,8 @@ export default function BuatPermohonanPage() {
     alamat: '',
     noHp: '',
     emailPemohon: '',
+    kirimLhpFisik: false,
+    alamatPengiriman: '',
   });
   const [samples, setSamples] = useState<SampleForm[]>([emptySample()]);
   const [suratFile, setSuratFile] = useState<File | null>(null);
@@ -304,6 +306,10 @@ export default function BuatPermohonanPage() {
       formData.append('alamat', form.alamat);
       formData.append('noHp', form.noHp);
       formData.append('emailPemohon', form.emailPemohon);
+      formData.append('kirimLhpFisik', String(form.kirimLhpFisik));
+      if (form.kirimLhpFisik && form.alamatPengiriman) {
+        formData.append('alamatPengiriman', form.alamatPengiriman);
+      }
 
       const samplesPayload = samples.map(s => ({
         kategori: s.kategori,
@@ -463,6 +469,39 @@ export default function BuatPermohonanPage() {
                 className="mt-2 text-xs text-red-500 hover:underline">
                 Hapus file
               </button>
+            )}
+          </div>
+        </div>
+
+        {/* Pengiriman LHP */}
+        <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden">
+          <div className="px-5 py-3 bg-slate-50 dark:bg-slate-900 border-b border-slate-100 dark:border-slate-700">
+            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Pengiriman Dokumen LHP</p>
+          </div>
+          <div className="p-5 space-y-3">
+            <label className="flex items-center gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={form.kirimLhpFisik}
+                onChange={e => setForm(prev => ({ ...prev, kirimLhpFisik: e.target.checked, alamatPengiriman: '' }))}
+                className="accent-blue-600 w-4 h-4"
+              />
+              <span className="text-sm text-slate-700 dark:text-slate-300">Saya ingin menerima dokumen fisik LHP (dikirim via pos/kurir)</span>
+            </label>
+            {form.kirimLhpFisik && (
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                  Alamat Pengiriman <span className="text-red-500">*</span>
+                </Label>
+                <Textarea
+                  placeholder="Alamat lengkap untuk pengiriman dokumen LHP..."
+                  value={form.alamatPengiriman}
+                  onChange={e => setForm(prev => ({ ...prev, alamatPengiriman: e.target.value }))}
+                  rows={3}
+                  className="dark:bg-slate-900 dark:border-slate-600 dark:text-white"
+                  required={form.kirimLhpFisik}
+                />
+              </div>
             )}
           </div>
         </div>

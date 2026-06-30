@@ -13,7 +13,7 @@ import { CheckCircle2, Clock } from 'lucide-react';
 export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [form, setForm] = useState({ nama: '', email: '', password: '', konfirmasi: '', jenisKelamin: '', tanggalLahir: '' });
+  const [form, setForm] = useState({ nama: '', email: '', password: '', konfirmasi: '', jenisKelamin: '', tanggalLahir: '', pekerjaan: '', pendidikanTerakhir: '' });
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -26,6 +26,8 @@ export default function RegisterPage() {
         password: form.password,
         jenisKelamin: form.jenisKelamin || undefined,
         tanggalLahir: form.tanggalLahir || undefined,
+        pekerjaan: form.pekerjaan || undefined,
+        pendidikanTerakhir: form.pendidikanTerakhir || undefined,
       });
       setSuccess(true);
     } catch (err: unknown) {
@@ -109,6 +111,38 @@ export default function RegisterPage() {
               onChange={(e) => setForm({ ...form, tanggalLahir: e.target.value })}
               className="h-11 dark:bg-slate-800 dark:border-slate-600 dark:text-white"
             />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1.5">
+            <Label htmlFor="pekerjaan" className="text-sm font-semibold text-slate-700 dark:text-slate-300">Pekerjaan</Label>
+            <Input
+              id="pekerjaan"
+              type="text"
+              placeholder="mis. Peneliti, Peternak"
+              value={form.pekerjaan}
+              onChange={(e) => setForm({ ...form, pekerjaan: e.target.value })}
+              className="h-11 dark:bg-slate-800 dark:border-slate-600 dark:text-white"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="pendidikanTerakhir" className="text-sm font-semibold text-slate-700 dark:text-slate-300">Pendidikan Terakhir</Label>
+            <select
+              id="pendidikanTerakhir"
+              value={form.pendidikanTerakhir}
+              onChange={(e) => setForm({ ...form, pendidikanTerakhir: e.target.value })}
+              className="w-full h-11 rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Pilih...</option>
+              <option value="SD">SD</option>
+              <option value="SMP">SMP</option>
+              <option value="SMA/SMK">SMA/SMK</option>
+              <option value="D3">D3</option>
+              <option value="S1">S1</option>
+              <option value="S2">S2</option>
+              <option value="S3">S3</option>
+            </select>
           </div>
         </div>
 

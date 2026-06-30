@@ -61,6 +61,8 @@ export class RequestsService {
         noHp: dto.noHp,
         emailPemohon: dto.emailPemohon,
         tanggalPermohonan: new Date(dto.tanggalPermohonan),
+        kirimLhpFisik: dto.kirimLhpFisik ?? false,
+        alamatPengiriman: dto.alamatPengiriman,
         suratPengantar,
         samples: {
           create: dto.samples.map((s) => ({

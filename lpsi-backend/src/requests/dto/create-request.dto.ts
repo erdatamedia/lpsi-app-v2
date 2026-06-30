@@ -57,6 +57,13 @@ export class CreateRequestDto {
   @IsDateString()
   tanggalPermohonan: string;
 
+  @IsOptional()
+  kirimLhpFisik?: boolean;
+
+  @IsOptional()
+  @IsString()
+  alamatPengiriman?: string;
+
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CreateSampleDto)

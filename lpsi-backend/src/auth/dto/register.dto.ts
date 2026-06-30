@@ -18,4 +18,12 @@ export class RegisterDto {
 
   @IsOptional()
   tanggalLahir?: string;
+
+  @IsOptional()
+  @IsString()
+  pekerjaan?: string;
+
+  @IsOptional()
+  @IsString()
+  pendidikanTerakhir?: string;
 }

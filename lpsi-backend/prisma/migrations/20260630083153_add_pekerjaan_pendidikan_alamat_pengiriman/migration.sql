@@ -1,0 +1,3 @@
+ALTER TABLE `User` ADD COLUMN `pekerjaan` VARCHAR(191) NULL;
+ALTER TABLE `User` ADD COLUMN `pendidikanTerakhir` VARCHAR(191) NULL;
+ALTER TABLE `LabRequest` ADD COLUMN `alamatPengiriman` VARCHAR(191) NULL;

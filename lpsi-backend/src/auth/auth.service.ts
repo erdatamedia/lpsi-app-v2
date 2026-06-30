@@ -36,6 +36,8 @@ export class AuthService {
         password: hash,
         jenisKelamin: dto.jenisKelamin,
         tanggalLahir: dto.tanggalLahir ? new Date(dto.tanggalLahir) : undefined,
+        pekerjaan: dto.pekerjaan,
+        pendidikanTerakhir: dto.pendidikanTerakhir,
         // isActive: false by default — aktivasi manual oleh admin
       },
     });
