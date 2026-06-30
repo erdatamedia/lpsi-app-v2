@@ -39,7 +39,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       sidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full',
     )}>
       <div className="p-5 border-b border-slate-800 flex items-center gap-3">
-        <NextImage src="/logo.png" alt="LPSI Logo" width={34} height={34} className="object-contain shrink-0" />
+        <NextImage src="/favicon.svg" alt="LPSI Logo" width={34} height={34} className="object-contain shrink-0" />
         <div>
           <h1 className="font-bold text-base text-white leading-none">LPSI</h1>
           <p className="text-xs text-slate-400 mt-0.5">Panel Admin</p>
@@ -87,7 +87,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <Menu size={20} />
           </button>
           <div className="flex items-center gap-2">
-            <NextImage src="/logo.png" alt="LPSI Logo" width={24} height={24} className="object-contain" />
+            <NextImage src="/favicon.svg" alt="LPSI Logo" width={24} height={24} className="object-contain" />
             <span className="font-bold text-white text-sm">LPSI Admin</span>
           </div>
           <ThemeToggle className="ml-auto text-slate-400 hover:bg-slate-800 hover:text-white" />

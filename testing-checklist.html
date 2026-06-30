@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dokumen Testing — LPSI v2</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f8fafc; color: #1e293b; font-size: 14px; }
+
+    .header { background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%); color: white; padding: 32px 40px; }
+    .header h1 { font-size: 24px; font-weight: 700; margin-bottom: 6px; }
+    .header p { opacity: 0.85; font-size: 13px; }
+    .header-meta { margin-top: 16px; display: flex; gap: 24px; flex-wrap: wrap; }
+    .header-meta span { background: rgba(255,255,255,0.15); padding: 4px 12px; border-radius: 20px; font-size: 12px; }
+
+    .progress-bar-wrap { background: #e2e8f0; padding: 16px 40px; border-bottom: 1px solid #cbd5e1; position: sticky; top: 0; z-index: 10; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+    .progress-bar-wrap .label { font-size: 12px; color: #64748b; margin-bottom: 6px; display: flex; justify-content: space-between; }
+    .progress-bar { height: 8px; background: #e2e8f0; border-radius: 99px; overflow: hidden; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, #2563eb, #16a34a); border-radius: 99px; transition: width 0.4s ease; }
+
+    .container { max-width: 960px; margin: 0 auto; padding: 32px 24px; }
+
+    .section { background: white; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 24px; overflow: hidden; }
+    .section-header { padding: 16px 20px; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; gap: 12px; }
+    .section-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+    .section-title { font-weight: 700; font-size: 15px; color: #0f172a; }
+    .section-subtitle { font-size: 12px; color: #94a3b8; margin-top: 2px; }
+    .section-count { margin-left: auto; font-size: 12px; color: #64748b; background: #f1f5f9; padding: 2px 10px; border-radius: 99px; white-space: nowrap; }
+
+    .test-list { padding: 8px 0; }
+    .test-item { display: flex; align-items: flex-start; gap: 12px; padding: 10px 20px; transition: background 0.15s; cursor: pointer; border-bottom: 1px solid #f8fafc; }
+    .test-item:last-child { border-bottom: none; }
+    .test-item:hover { background: #f8fafc; }
+    .test-item.checked { background: #f0fdf4; }
+    .test-item.checked .test-label { color: #16a34a; text-decoration: line-through; text-decoration-color: #86efac; }
+
+    .checkbox { width: 18px; height: 18px; border: 2px solid #cbd5e1; border-radius: 5px; flex-shrink: 0; margin-top: 1px; display: flex; align-items: center; justify-content: center; transition: all 0.15s; cursor: pointer; }
+    .checkbox.checked { background: #16a34a; border-color: #16a34a; }
+    .checkbox.checked::after { content: '✓'; color: white; font-size: 11px; font-weight: 700; }
+
+    .test-label { flex: 1; line-height: 1.5; }
+    .test-label strong { color: #0f172a; }
+    .test-note { font-size: 11px; color: #94a3b8; margin-top: 2px; display: block; }
+
+    .badge { display: inline-block; font-size: 10px; font-weight: 600; padding: 1px 7px; border-radius: 99px; margin-left: 6px; vertical-align: middle; }
+    .badge-admin { background: #dbeafe; color: #1d4ed8; }
+    .badge-pemohon { background: #fef3c7; color: #b45309; }
+    .badge-publik { background: #f3e8ff; color: #7c3aed; }
+
+    .result-area { padding: 10px 20px 14px; }
+    .result-label { font-size: 11px; color: #94a3b8; margin-bottom: 4px; }
+    .result-input { width: 100%; border: 1px solid #e2e8f0; border-radius: 6px; padding: 6px 10px; font-size: 12px; color: #334155; resize: none; font-family: inherit; }
+    .result-input:focus { outline: none; border-color: #93c5fd; }
+
+    .info-box { margin: 16px 20px; padding: 12px 16px; border-radius: 8px; font-size: 12px; line-height: 1.6; }
+    .info-box.blue { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; }
+    .info-box.amber { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; }
+
+    .signature-area { margin-top: 48px; display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+    .signature-box { border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; text-align: center; }
+    .signature-box .role { font-size: 12px; color: #64748b; margin-bottom: 64px; }
+    .signature-box .line { border-top: 1px solid #cbd5e1; padding-top: 8px; }
+    .signature-box .name { font-size: 12px; font-weight: 600; }
+
+    .print-btn { position: fixed; bottom: 24px; right: 24px; background: #1d4ed8; color: white; border: none; padding: 12px 20px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 12px rgba(29,78,216,0.3); display: flex; align-items: center; gap-8px; gap: 8px; }
+    .print-btn:hover { background: #1e40af; }
+
+    .summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
+    .summary-card { background: white; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px; text-align: center; }
+    .summary-card .num { font-size: 28px; font-weight: 700; }
+    .summary-card .lbl { font-size: 11px; color: #64748b; margin-top: 2px; }
+    .summary-card.total .num { color: #1d4ed8; }
+    .summary-card.done .num { color: #16a34a; }
+    .summary-card.pending .num { color: #f59e0b; }
+
+    @media print {
+      .print-btn, .progress-bar-wrap { display: none; }
+      .section { break-inside: avoid; }
+      body { background: white; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>📋 Dokumen Testing — LPSI v2</h1>
+  <p>Layanan Pelacakan Hasil Lab — BRMP Ruminansia Besar, BRIN</p>
+  <div class="header-meta">
+    <span>🌐 https://lpsi.brmprb.site</span>
+    <span>📅 Tanggal Testing: _______________</span>
+    <span>👤 Penguji: _______________</span>
+    <span>🔖 Versi: v2.0</span>
+  </div>
+</div>
+
+<div class="progress-bar-wrap">
+  <div class="label">
+    <span>Progress Testing</span>
+    <span id="progress-text">0 / 0 selesai</span>
+  </div>
+  <div class="progress-bar">
+    <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="summary-grid">
+    <div class="summary-card total">
+      <div class="num" id="sum-total">0</div>
+      <div class="lbl">Total Skenario</div>
+    </div>
+    <div class="summary-card done">
+      <div class="num" id="sum-done">0</div>
+      <div class="lbl">Lulus ✓</div>
+    </div>
+    <div class="summary-card pending">
+      <div class="num" id="sum-pending">0</div>
+      <div class="lbl">Belum Diuji</div>
+    </div>
+  </div>
+
+  <!-- ==================== AKUN PENGUJIAN ==================== -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:#eff6ff">🔑</div>
+      <div>
+        <div class="section-title">Akun Pengujian</div>
+        <div class="section-subtitle">Gunakan akun berikut selama proses testing</div>
+      </div>
+    </div>
+    <div class="info-box blue">
+      <strong>Admin:</strong> admin@lpsi.brmprb.site / AdminLPSI123!<br>
+      <strong>Pemohon (buat baru):</strong> Daftar akun baru → aktivasi via admin → login
+    </div>
+    <div class="info-box amber">
+      ⚠️ Catat setiap temuan bug atau ketidaksesuaian di kolom catatan yang tersedia. Screenshot dianjurkan untuk bukti.
+    </div>
+  </div>
+
+  <!-- ==================== HALAMAN PUBLIK ==================== -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:#f3e8ff">🌐</div>
+      <div>
+        <div class="section-title">Halaman Publik</div>
+        <div class="section-subtitle">Dapat diakses tanpa login</div>
+      </div>
+      <div class="section-count" id="count-publik"></div>
+    </div>
+    <div class="test-list" data-group="publik">
+      <div class="test-item" onclick="toggle(this)">
+        <div class="checkbox"></div>
+        <div class="test-label">
+          <strong>Landing page tampil</strong> <span class="badge badge-publik">Publik</span>
+          <span class="test-note">Buka https://lpsi.brmprb.site — halaman utama muncul dengan logo, slideshow, dan navigasi</span>
+        </div>
+      </div>
+      <div class="test-item" onclick="toggle(this)">
+        <div class="checkbox"></div>
+        <div class="test-label">
+          <strong>Logo AGROMODERN tampil</strong> <span class="badge badge-publik">Publik</span>
+          <span class="test-note">Logo PNG muncul di navbar, bukan ikon flask biru</span>
+        </div>
+      </div>
+      <div class="test-item" onclick="toggle(this)">
+        <div class="checkbox"></div>
+        <div class="test-label">
+          <strong>Halaman Layanan</strong> <span class="badge badge-publik">Publik</span>
+          <span class="test-note">Buka /layanan — daftar layanan pengujian muncul</span>
+        </div>
+      </div>
+      <div class="test-item" onclick="toggle(this)">
+        <div class="checkbox"></div>
+        <div class="test-label">
+          <strong>Halaman Alur</strong> <span class="badge badge-publik">Publik</span>
+          <span class="test-note">Buka /alur — langkah-langkah pengajuan permohonan muncul</span>
+        </div>
+      </div>
+      <div class="test-item" onclick="toggle(this)">
+        <div class="checkbox"></div>
+        <div class="test-label">
+          <strong>Favicon tampil</strong> <span class="badge badge-publik">Publik</span>
+          <span class="test-note">Tab browser menampilkan logo AGROMODERN sebagai favicon</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== AUTENTIKASI ==================== -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:#fef3c7">🔐</div>
+      <div>
+        <div class="section-title">Autentikasi</div>
+        <div class="section-subtitle">Register, login, logout, lupa password</div>
+      </div>
+      <div class="section-count" id="count-auth"></div>
+    </div>
+    <div class="test-list" data-group="auth">
+      <div class="test-item" onclick="toggle(this)">
+        <div class="checkbox"></div>
+        <div class="test-label">
+          <strong>Register akun pemohon baru</strong>
+          <span class="test-note">Isi form register → submit → muncul halaman "Menunggu Verifikasi Admin" dengan informasi 1×24 jam</span>
+        </div>
+      </div>
+      <div class="test-item" onclick="toggle(this)">
+        <div class="checkbox"></div>
+        <div class="test-label">
+          <strong>Login dengan akun belum diaktivasi</strong>
+          <span class="test-note">Coba login sebelum diaktivasi admin → muncul pesan "Akun belum diaktivasi. Harap menunggu verifikasi admin."</span>
+        </div>
+      </div>
+      <div class="test-item" onclick="toggle(this)">
+        <div class="checkbox"></div>
+        <div class="test-label">
+          <strong>Login Admin berhasil</strong> <span class="badge badge-admin">Admin</span>
+          <span class="test-note">Login dengan admin@lpsi.brmprb.site → masuk ke /admin/dashboard</span>
+        </div>
+      </div>
+      <div class="test-item" onclick="toggle(this)">
+        <div class="checkbox"></div>
+        <div class="test-label">
+          <strong>Aktivasi akun pemohon oleh admin</strong> <span class="badge badge-admin">Admin</span>
+          <span class="test-note">Admin buka /admin/akun → akun pemohon baru muncul dengan status "Menunggu" → klik Aktifkan → status berubah "Aktif"</span>
+        </div>
+      </div>
+      <div class="test-item" onclick="toggle(this)">
+        <div class="checkbox"></div>
+        <div class="test-label">
+          <strong>Login Pemohon setelah diaktivasi</strong> <span class="badge badge-pemohon">Pemohon</span>
+          <span class="test-note">Login dengan akun yang sudah diaktivasi → masuk ke /dashboard</span>
+        </div>
+      </div>
+      <div class="test-item" onclick="toggle(this)">
+        <div class="checkbox"></div>
+        <div class="test-label">
+          <strong>Nonaktifkan akun pemohon</strong> <span class="badge badge-admin">Admin</span>
+          <span class="test-note">Admin klik Nonaktifkan pada akun aktif → status berubah "Menunggu" → pemohon tidak bisa login</span>
+        </div>
+      </div>
+      <div class="test-item" onclick="toggle(this)">
+        <div class="checkbox"></div>
+        <div class="test-label">
+          <strong>Logout</strong>
+          <span class="test-note">Klik Logout di sidebar → kembali ke halaman login</span>
+        </div>
+      </div>
+      <div class="test-item" onclick="toggle(this)">
+        <div class="checkbox"></div>
+        <div class="test-label">
+          <strong>Lupa password — kirim link reset</strong>
+          <span class="test-note">Buka /lupa-password → masukkan email → sistem mengirim link reset (jika SMTP aktif)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== ADMIN - KONTEN ==================== -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:#fce7f3">🖼️</div>
+      <div>
+        <div class="section-title">Admin — Kelola Konten</div>
+        <div class="section-subtitle">Slideshow dan gambar landing page</div>
+      </div>
+      <div class="section-count" id="count-konten"></div>
+    </div>
+    <div class="test-list" data-group="konten">
+      <div class="test-item" onclick="toggle(this)">
+        <div class="checkbox"></div>
+        <div class="test-label">
+          <strong>Upload slide baru</strong> <span class="badge badge-admin">Admin</span>
+          <span class="test-note">Admin buka /admin/konten → Upload Slide → pilih gambar PNG/JPG → isi caption → simpan → gambar muncul di daftar</span>
+        </div>
+      </div>
+      <div class="test-item" onclick="toggle(this)">
+        <div class="checkbox"></div>
+        <div class="test-label">
+          <strong>Slide tampil di landing page</strong> <span class="badge badge-publik">Publik</span>
+          <span class="test-note">Buka https://lpsi.brmprb.site → slideshow menampilkan gambar yang baru diupload</span>
+        </div>
+      </div>
+      <div class="test-item" onclick="toggle(this)">
+        <div class="checkbox"></div>
+        <div class="test-label">
+          <strong>Hapus slide</strong> <span class="badge badge-admin">Admin</span>
+          <span class="test-note">Klik hapus pada slide → slide hilang dari daftar dan landing page</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== ADMIN - LAYANAN ==================== -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:#ecfdf5">🧪</div>
+      <div>
+        <div class="section-title">Admin — Kelola Layanan</div>
+        <div class="section-subtitle">Kategori dan item layanan pengujian</div>
+      </div>
+      <div class="section-count" id="count-layanan"></div>
+    </div>
+    <div class="test-list" data-group="layanan">
+      <div class="test-item" onclick="toggle(this)">
+        <div class="checkbox"></div>
+        <div class="test-label">
+          <strong>Tambah kategori layanan</strong> <span class="badge badge-admin">Admin</span>
+          <span class="test-note">Admin buka /admin/layanan → Tambah Kategori → isi nama → simpan → muncul di daftar</span>
+        </div>
+      </div>
+      <div class="test-item" onclick="toggle(this)">
+        <div class="checkbox"></div>
+        <div class="test-label">
+          <strong>Tambah item layanan dalam kategori</strong> <span class="badge badge-admin">Admin</span>
+          <span class="test-note">Klik tambah item pada kategori → isi nama layanan → simpan</span>
+        </div>
+      </div>
+      <div class="test-item" onclick="toggle(this)">
+        <div class="checkbox"></div>
+        <div class="test-label">
+          <strong>Layanan tampil di halaman publik</strong> <span class="badge badge-publik">Publik</span>
+          <span class="test-note">Buka /layanan → layanan yang baru ditambahkan muncul</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== PEMOHON - PERMOHONAN ==================== -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:#fffbeb">📝</div>
+      <div>
+        <div class="section-title">Pemohon — Pengajuan Permohonan</div>
+        <div class="section-subtitle">Buat dan pantau permohonan pengujian</div>
+      </div>
+      <div class="section-count" id="count-permohonan"></div>
+    </div>
+    <div class="test-list" data-group="permohonan">
+      <div class="test-item" onclick="toggle(this)">
+        <div class="checkbox"></div>
+        <div class="test-label">
+          <strong>Buat permohonan baru</strong> <span class="badge badge-pemohon">Pemohon</span>
+          <span class="test-note">Buka /permohonan/baru → isi semua field wajib → tambah minimal 1 sampel → submit → muncul nomor permohonan format LPSI-YYMM-NNN</span>
+        </div>
+      </div>
+      <div class="test-item" onclick="toggle(this)">
+        <div class="checkbox"></div>
+        <div class="test-label">
+          <strong>Upload surat pengantar (opsional)</strong> <span class="badge badge-pemohon">Pemohon</span>
+          <span class="test-note">Saat buat permohonan, upload file PDF surat pengantar → berhasil tersimpan</span>
+        </div>
+      </div>
+      <div class="test-item" onclick="toggle(this)">
+        <div class="checkbox"></div>
+        <div class="test-label">
+          <strong>Daftar permohonan tampil</strong> <span class="badge badge-pemohon">Pemohon</span>
+          <span class="test-note">Buka /permohonan → permohonan yang baru dibuat muncul dengan status "Menunggu Sampel"</span>
+        </div>
+      </div>
+      <div class="test-item" onclick="toggle(this)">
+        <div class="checkbox"></div>
+        <div class="test-label">
+          <strong>Detail permohonan — Tab layout</strong> <span class="badge badge-pemohon">Pemohon</span>
+          <span class="test-note">Buka detail permohonan → tampil 5 tab: Detail, Pengiriman & Verifikasi, Pembayaran, Analisa & LHP, Riwayat</span>
+        </div>
+      </div>
+      <div class="test-item" onclick="toggle(this)">
+        <div class="checkbox"></div>
+        <div class="test-label">
+          <strong>Tab terkunci sesuai status</strong> <span class="badge badge-pemohon">Pemohon</span>
+          <span class="test-note">Tab Pembayaran terkunci saat status masih Menunggu Sampel — ikon gembok muncul</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== ADMIN - VERIFIKASI ==================== -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:#eff6ff">✅</div>
+      <div>
+        <div class="section-title">Admin — Verifikasi Sampel</div>
+        <div class="section-subtitle">Terima, verifikasi, atau tolak sampel</div>
+      </div>
+      <div class="section-count" id="count-verifikasi"></div>
+    </div>
+    <div class="test-list" data-group="verifikasi">
+      <div class="test-item" onclick="toggle(this)">
+        <div class="checkbox"></div>
+        <div class="test-label">
+          <strong>Permohonan muncul di daftar admin</strong> <span class="badge badge-admin">Admin</span>
+          <span class="test-note">Admin buka /admin/permohonan → permohonan dari pemohon muncul</span>
+        </div>
+      </div>
+      <div class="test-item" onclick="toggle(this)">
+        <div class="checkbox"></div>
+        <div class="test-label">
+          <strong>Update status ke "Sampel Diterima"</strong> <span class="badge badge-admin">Admin</span>
+          <span class="test-note">Buka detail permohonan admin → ubah status ke Sampel Diterima → berhasil tersimpan</span>
+        </div>
+      </div>
+      <div class="test-item" onclick="toggle(this)">
+        <div class="checkbox"></div>
+        <div class="test-label">
+          <strong>Lihat surat pengantar PDF</strong> <span class="badge badge-admin">Admin</span>
+          <span class="test-note">Tab Verifikasi Sampel → klik "Lihat Surat" → PDF terbuka di modal popup (tidak download)</span>
+        </div>
+      </div>
+      <div class="test-item" onclick="toggle(this)">
+        <div class="checkbox"></div>
+        <div class="test-label">
+          <strong>Verifikasi sampel — Terima (OK)</strong> <span class="badge badge-admin">Admin</span>
+          <span class="test-note">Tab Verifikasi Sampel → klik Terima pada sampel → status sampel berubah OK → tombol verifikasi hilang</span>
+        </div>
+      </div>
+      <div class="test-item" onclick="toggle(this)">
+        <div class="checkbox"></div>
+        <div class="test-label">
+          <strong>Verifikasi sampel — Tolak</strong> <span class="badge badge-admin">Admin</span>
+          <span class="test-note">Klik Tolak → isi alasan penolakan → simpan → status sampel berubah DITOLAK</span>
+        </div>
+      </div>
+      <div class="test-item" onclick="toggle(this)">
+        <div class="checkbox"></div>
+        <div class="test-label">
+          <strong>Update status ke "Verifikasi"</strong> <span class="badge badge-admin">Admin</span>
+          <span class="test-note">Setelah semua sampel diverifikasi → ubah status ke Verifikasi</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== ADMIN - BILLING ==================== -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:#fef9c3">💰</div>
+      <div>
+        <div class="section-title">Admin — Billing & Pembayaran</div>
+        <div class="section-subtitle">Input e-billing, konfirmasi pembayaran</div>
+      </div>
+      <div class="section-count" id="count-billing"></div>
+    </div>
+    <div class="test-list" data-group="billing">
+      <div class="test-item" onclick="toggle(this)">
+        <div class="checkbox"></div>
+        <div class="test-label">
+          <strong>Input kode billing dan total tagihan</strong> <span class="badge badge-admin">Admin</span>
+          <span class="test-note">Tab Billing & Bayar → isi total tagihan (angka) dan upload file e-billing PDF → simpan → status otomatis ke Menunggu Pembayaran</span>
+        </div>
+      </div>
+      <div class="test-item" onclick="toggle(this)">
+        <div class="checkbox"></div>
+        <div class="test-label">
+          <strong>Pemohon melihat kode billing</strong> <span class="badge badge-pemohon">Pemohon</span>
+          <span class="test-note">Pemohon buka tab Pembayaran → klik "Lihat Kode Billing" → PDF billing terbuka di modal (tidak download)</span>
+        </div>
+      </div>
+      <div class="test-item" onclick="toggle(this)">
+        <div class="checkbox"></div>
+        <div class="test-label">
+          <strong>Upload bukti bayar</strong> <span class="badge badge-pemohon">Pemohon</span>
+          <span class="test-note">Pemohon upload gambar/PDF bukti bayar → berhasil tersimpan</span>
+        </div>
+      </div>
+      <div class="test-item" onclick="toggle(this)">
+        <div class="checkbox"></div>
+        <div class="test-label">
+          <strong>Admin lihat bukti bayar</strong> <span class="badge badge-admin">Admin</span>
+          <span class="test-note">Admin buka tab Billing & Bayar → klik "Lihat Bukti" → gambar/PDF terbuka di modal popup (tidak download)</span>
+        </div>
+      </div>
+      <div class="test-item" onclick="toggle(this)">
+        <div class="checkbox"></div>
+        <div class="test-label">
+          <strong>Konfirmasi pembayaran LUNAS</strong> <span class="badge badge-admin">Admin</span>
+          <span class="test-note">Admin klik "Konfirmasi Lunas" → status permohonan berubah LUNAS</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== ADMIN - LHP ==================== -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:#f0fdf4">📄</div>
+      <div>
+        <div class="section-title">Admin — Analisa & LHP</div>
+        <div class="section-subtitle">Upload LHP, update status, resi pengiriman</div>
+      </div>
+      <div class="section-count" id="count-lhp"></div>
+    </div>
+    <div class="test-list" data-group="lhp">
+      <div class="test-item" onclick="toggle(this)">
+        <div class="checkbox"></div>
+        <div class="test-label">
+          <strong>Update status ke "On Progress"</strong> <span class="badge badge-admin">Admin</span>
+          <span class="test-note">Ubah status permohonan ke ON_PROGRESS → Tab LHP menjadi aktif</span>
+        </div>
+      </div>
+      <div class="test-item" onclick="toggle(this)">
+        <div class="checkbox"></div>
+        <div class="test-label">
+          <strong>Upload LHP per sampel</strong> <span class="badge badge-admin">Admin</span>
+          <span class="test-note">Tab LHP → upload file PDF LHP untuk setiap sampel → berhasil tersimpan</span>
+        </div>
+      </div>
+      <div class="test-item" onclick="toggle(this)">
+        <div class="checkbox"></div>
+        <div class="test-label">
+          <strong>Update status ke "Selesai"</strong> <span class="badge badge-admin">Admin</span>
+          <span class="test-note">Ubah status ke SELESAI → bagian pengiriman fisik LHP muncul</span>
+        </div>
+      </div>
+      <div class="test-item" onclick="toggle(this)">
+        <div class="checkbox"></div>
+        <div class="test-label">
+          <strong>Input nomor resi pengiriman LHP</strong> <span class="badge badge-admin">Admin</span>
+          <span class="test-note">Admin input nomor resi pengiriman fisik → tersimpan → muncul di sisi pemohon</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== PEMOHON - SKM & LHP ==================== -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:#fdf4ff">⭐</div>
+      <div>
+        <div class="section-title">Pemohon — SKM & Download LHP</div>
+        <div class="section-subtitle">Isi survei kepuasan dan unduh laporan</div>
+      </div>
+      <div class="section-count" id="count-skm"></div>
+    </div>
+    <div class="test-list" data-group="skm">
+      <div class="test-item" onclick="toggle(this)">
+        <div class="checkbox"></div>
+        <div class="test-label">
+          <strong>Tab Analisa & LHP aktif saat ON_PROGRESS</strong> <span class="badge badge-pemohon">Pemohon</span>
+          <span class="test-note">Saat status ON_PROGRESS, pemohon bisa membuka tab Analisa & LHP</span>
+        </div>
+      </div>
+      <div class="test-item" onclick="toggle(this)">
+        <div class="checkbox"></div>
+        <div class="test-label">
+          <strong>Download LHP diblokir sebelum isi SKM</strong> <span class="badge badge-pemohon">Pemohon</span>
+          <span class="test-note">Tombol Download LHP tidak aktif / menampilkan pesan "Isi SKM dulu" sebelum survei diisi</span>
+        </div>
+      </div>
+      <div class="test-item" onclick="toggle(this)">
+        <div class="checkbox"></div>
+        <div class="test-label">
+          <strong>Isi SKM / IKM</strong> <span class="badge badge-pemohon">Pemohon</span>
+          <span class="test-note">Klik "Pengisian SKM" → isi semua pertanyaan survei → submit → berhasil</span>
+        </div>
+      </div>
+      <div class="test-item" onclick="toggle(this)">
+        <div class="checkbox"></div>
+        <div class="test-label">
+          <strong>Download LHP setelah isi SKM</strong> <span class="badge badge-pemohon">Pemohon</span>
+          <span class="test-note">Setelah SKM diisi → klik "Download LHP" → file PDF LHP berhasil diunduh</span>
+        </div>
+      </div>
+      <div class="test-item" onclick="toggle(this)">
+        <div class="checkbox"></div>
+        <div class="test-label">
+          <strong>Informasi resi pengiriman LHP</strong> <span class="badge badge-pemohon">Pemohon</span>
+          <span class="test-note">Jika admin input resi → pemohon melihat nomor resi di tab Analisa & LHP</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== ACTIVITY LOG ==================== -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:#f0f9ff">📅</div>
+      <div>
+        <div class="section-title">Riwayat Aktivitas (Activity Log)</div>
+        <div class="section-subtitle">Timeline tracking setiap perubahan permohonan</div>
+      </div>
+      <div class="section-count" id="count-log"></div>
+    </div>
+    <div class="test-list" data-group="log">
+      <div class="test-item" onclick="toggle(this)">
+        <div class="checkbox"></div>
+        <div class="test-label">
+          <strong>Tab Riwayat pemohon menampilkan timeline</strong> <span class="badge badge-pemohon">Pemohon</span>
+          <span class="test-note">Buka tab Riwayat → muncul timeline vertikal dengan timestamp dan keterangan setiap aktivitas</span>
+        </div>
+      </div>
+      <div class="test-item" onclick="toggle(this)">
+        <div class="checkbox"></div>
+        <div class="test-label">
+          <strong>Tab Riwayat admin menampilkan timeline</strong> <span class="badge badge-admin">Admin</span>
+          <span class="test-note">Admin buka tab Riwayat pada permohonan → timeline lengkap dari awal pengajuan</span>
+        </div>
+      </div>
+      <div class="test-item" onclick="toggle(this)">
+        <div class="checkbox"></div>
+        <div class="test-label">
+          <strong>Log tercatat saat perubahan status</strong>
+          <span class="test-note">Setiap kali status diubah → entri baru muncul di tab Riwayat dengan waktu WIB</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== NOTIFIKASI ==================== -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:#fff7ed">🔔</div>
+      <div>
+        <div class="section-title">Notifikasi</div>
+        <div class="section-subtitle">Notifikasi in-app untuk pemohon</div>
+      </div>
+      <div class="section-count" id="count-notif"></div>
+    </div>
+    <div class="test-list" data-group="notif">
+      <div class="test-item" onclick="toggle(this)">
+        <div class="checkbox"></div>
+        <div class="test-label">
+          <strong>Badge notifikasi muncul</strong> <span class="badge badge-pemohon">Pemohon</span>
+          <span class="test-note">Saat ada notifikasi baru → badge merah muncul di ikon notifikasi sidebar</span>
+        </div>
+      </div>
+      <div class="test-item" onclick="toggle(this)">
+        <div class="checkbox"></div>
+        <div class="test-label">
+          <strong>Daftar notifikasi tampil</strong> <span class="badge badge-pemohon">Pemohon</span>
+          <span class="test-note">Buka /notifikasi → daftar notifikasi muncul dengan pesan perubahan status</span>
+        </div>
+      </div>
+      <div class="test-item" onclick="toggle(this)">
+        <div class="checkbox"></div>
+        <div class="test-label">
+          <strong>Tandai notifikasi dibaca</strong> <span class="badge badge-pemohon">Pemohon</span>
+          <span class="test-note">Klik notifikasi → status berubah dibaca → badge berkurang</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== CATATAN UMUM ==================== -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:#f1f5f9">📌</div>
+      <div>
+        <div class="section-title">Catatan & Temuan Bug</div>
+        <div class="section-subtitle">Catat temuan yang perlu ditindaklanjuti</div>
+      </div>
+    </div>
+    <div class="result-area">
+      <div class="result-label">Temuan bug / ketidaksesuaian / saran perbaikan:</div>
+      <textarea class="result-input" rows="6" placeholder="Contoh:&#10;- Halaman /layanan lambat load saat pertama buka&#10;- Tombol X tidak bekerja di browser Safari&#10;- Saran: tambahkan konfirmasi sebelum hapus slide"></textarea>
+    </div>
+    <div class="result-area">
+      <div class="result-label">Kesimpulan hasil testing:</div>
+      <textarea class="result-input" rows="3" placeholder="Contoh: Sistem berjalan baik secara keseluruhan. Ditemukan 2 minor bug yang sudah dicatat. Siap untuk digunakan."></textarea>
+    </div>
+  </div>
+
+  <!-- ==================== TTD ==================== -->
+  <div class="signature-area">
+    <div class="signature-box">
+      <div class="role">Penguji / Perwakilan Klien</div>
+      <div class="line">
+        <div class="name">( ________________________________ )</div>
+        <div style="font-size:11px;color:#94a3b8;margin-top:4px;">Nama & Tanda Tangan</div>
+      </div>
+    </div>
+    <div class="signature-box">
+      <div class="role">Developer / Vendor</div>
+      <div class="line">
+        <div class="name">( ________________________________ )</div>
+        <div style="font-size:11px;color:#94a3b8;margin-top:4px;">Nama & Tanda Tangan</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align:center;margin-top:32px;color:#94a3b8;font-size:11px;">
+    LPSI v2 — Dokumen Testing Fungsional · Dibuat oleh Vendor
+  </div>
+
+</div>
+
+<button class="print-btn" onclick="window.print()">🖨️ Cetak / Simpan PDF</button>
+
+<script>
+  function toggle(item) {
+    const cb = item.querySelector('.checkbox');
+    const isChecked = cb.classList.contains('checked');
+    cb.classList.toggle('checked', !isChecked);
+    item.classList.toggle('checked', !isChecked);
+    updateProgress();
+    updateGroupCount(item.closest('[data-group]'));
+  }
+
+  function updateProgress() {
+    const all = document.querySelectorAll('.test-item');
+    const done = document.querySelectorAll('.test-item.checked');
+    const total = all.length;
+    const completed = done.length;
+    const pct = total ? (completed / total * 100).toFixed(0) : 0;
+
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('progress-text').textContent = completed + ' / ' + total + ' selesai (' + pct + '%)';
+    document.getElementById('sum-total').textContent = total;
+    document.getElementById('sum-done').textContent = completed;
+    document.getElementById('sum-pending').textContent = total - completed;
+  }
+
+  function updateGroupCount(group) {
+    if (!group) return;
+    const name = group.dataset.group;
+    const all = group.querySelectorAll('.test-item').length;
+    const done = group.querySelectorAll('.test-item.checked').length;
+    const el = document.getElementById('count-' + name);
+    if (el) el.textContent = done + ' / ' + all;
+  }
+
+  // Init
+  document.querySelectorAll('[data-group]').forEach(g => updateGroupCount(g));
+  updateProgress();
+</script>
+</body>
+</html>

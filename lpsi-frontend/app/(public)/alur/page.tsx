@@ -60,7 +60,7 @@ export default function AlurPage() {
     <div className="min-h-screen flex flex-col bg-white">
       <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-slate-100 px-5 py-3.5 flex justify-between items-center">
         <div className="flex items-center gap-2.5">
-          <Image src="/logo.png" alt="LPSI Logo" width={34} height={34} className="object-contain" />
+          <Image src="/favicon.svg" alt="LPSI Logo" width={34} height={34} className="object-contain" />
           <Link href="/" className="font-bold text-slate-900">LPSI</Link>
         </div>
         <div className="flex items-center gap-2">

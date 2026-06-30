@@ -70,7 +70,7 @@ export default function HomePage() {
       {/* Navbar */}
       <nav className="sticky top-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur border-b border-slate-100 dark:border-slate-800 px-5 py-3.5 flex justify-between items-center">
         <div className="flex items-center gap-2.5">
-          <Image src="/logo.png" alt="LPSI Logo" width={36} height={36} className="object-contain" />
+          <Image src="/favicon.svg" alt="LPSI Logo" width={36} height={36} className="object-contain" />
           <div>
             <span className="font-bold text-slate-900 dark:text-white text-base leading-none block">LPSI</span>
             <span className="text-slate-400 text-xs hidden sm:block">Layanan Pelacakan Hasil Lab</span>
