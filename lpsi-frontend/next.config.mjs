@@ -14,6 +14,11 @@ const nextConfig = {
       },
       {
         protocol: 'https',
+        hostname: 'lab.brmprb.site',
+        pathname: '/uploads/**',
+      },
+      {
+        protocol: 'https',
         hostname: 'lpsi.brmp-ruminansia.go.id',
         pathname: '/uploads/**',
       },
