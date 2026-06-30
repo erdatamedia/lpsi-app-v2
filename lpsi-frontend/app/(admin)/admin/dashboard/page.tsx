@@ -18,6 +18,7 @@ const statusColor: Record<RequestStatus, string> = {
   MENUNGGU_SAMPEL: 'bg-yellow-50 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300',
   SAMPEL_DITERIMA: 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
   VERIFIKASI: 'bg-purple-50 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300',
+  MENUNGGU_BILLING: 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300',
   MENUNGGU_PEMBAYARAN: 'bg-orange-50 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300',
   LUNAS: 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300',
   ON_PROGRESS: 'bg-cyan-50 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-300',

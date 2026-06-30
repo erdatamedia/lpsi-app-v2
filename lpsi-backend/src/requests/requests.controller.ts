@@ -125,6 +125,8 @@ export class RequestsController {
     if (request.userId !== user.id) throw new ForbiddenException('Akses ditolak');
     if (!request.eBillingFile) throw new NotFoundException('File e-billing belum tersedia');
     const uploadDir = this.config.get<string>('UPLOAD_DIR') ?? './uploads';
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `inline; filename="ebilling-${request.nomorPermohonan}.pdf"`);
     return res.sendFile(request.eBillingFile, { root: join(process.cwd(), uploadDir) });
   }
 
@@ -148,6 +150,6 @@ export class RequestsController {
     if (!sample || !sample.lhpFile) throw new NotFoundException('File LHP tidak ditemukan');
 
     const uploadDir = this.config.get<string>('UPLOAD_DIR') ?? './uploads';
-    return res.sendFile(sample.lhpFile, { root: uploadDir });
+    return res.sendFile(sample.lhpFile, { root: join(process.cwd(), uploadDir) });
   }
 }

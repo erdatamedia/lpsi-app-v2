@@ -35,4 +35,18 @@ export class UsersController {
   toggleActivate(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.toggleActivate(id);
   }
+
+  @UseGuards(RolesGuard)
+  @Roles('ADMIN')
+  @Patch('admin/:id/approve-reset')
+  approveReset(@Param('id', ParseIntPipe) id: number) {
+    return this.usersService.approveReset(id);
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles('ADMIN')
+  @Patch('admin/:id/reject-reset')
+  rejectReset(@Param('id', ParseIntPipe) id: number) {
+    return this.usersService.rejectReset(id);
+  }
 }

@@ -3,13 +3,14 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import api from '@/lib/api';
-import { Users, CheckCircle2, XCircle, RefreshCw } from 'lucide-react';
+import { Users, CheckCircle2, XCircle, RefreshCw, KeyRound } from 'lucide-react';
 
 interface UserAccount {
   id: number;
   nama: string;
   email: string;
   isActive: boolean;
+  resetRequested: boolean;
   createdAt: string;
 }
 
@@ -17,6 +18,7 @@ export default function AdminAkunPage() {
   const [users, setUsers] = useState<UserAccount[]>([]);
   const [loading, setLoading] = useState(true);
   const [toggling, setToggling] = useState<number | null>(null);
+  const [resetting, setResetting] = useState<number | null>(null);
 
   async function fetchUsers() {
     try {
@@ -45,8 +47,35 @@ export default function AdminAkunPage() {
     }
   }
 
+  async function handleApproveReset(user: UserAccount) {
+    setResetting(user.id);
+    try {
+      const res = await api.patch(`/users/admin/${user.id}/approve-reset`);
+      toast.success(res.data.message);
+      setUsers(prev => prev.map(u => u.id === user.id ? { ...u, resetRequested: false } : u));
+    } catch {
+      toast.error('Gagal menyetujui reset password');
+    } finally {
+      setResetting(null);
+    }
+  }
+
+  async function handleRejectReset(user: UserAccount) {
+    setResetting(user.id);
+    try {
+      const res = await api.patch(`/users/admin/${user.id}/reject-reset`);
+      toast.success(res.data.message);
+      setUsers(prev => prev.map(u => u.id === user.id ? { ...u, resetRequested: false } : u));
+    } catch {
+      toast.error('Gagal menolak reset password');
+    } finally {
+      setResetting(null);
+    }
+  }
+
   const active = users.filter(u => u.isActive).length;
   const pending = users.filter(u => !u.isActive).length;
+  const resetPending = users.filter(u => u.resetRequested).length;
 
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-6">
@@ -58,7 +87,7 @@ export default function AdminAkunPage() {
           </div>
           <div>
             <h1 className="text-xl font-bold text-slate-900 dark:text-white">Kelola Akun Pemohon</h1>
-            <p className="text-sm text-slate-500 dark:text-slate-400">Aktivasi atau nonaktifkan akun pemohon</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Aktivasi akun dan kelola permintaan reset password</p>
           </div>
         </div>
         <button
@@ -70,7 +99,7 @@ export default function AdminAkunPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-4 gap-4">
         <div className="bg-white dark:bg-slate-900 rounded-xl p-4 border border-slate-200 dark:border-slate-800">
           <p className="text-sm text-slate-500 dark:text-slate-400">Total Akun</p>
           <p className="text-2xl font-bold text-slate-900 dark:text-white mt-1">{users.length}</p>
@@ -83,7 +112,21 @@ export default function AdminAkunPage() {
           <p className="text-sm text-slate-500 dark:text-slate-400">Menunggu Verifikasi</p>
           <p className="text-2xl font-bold text-amber-600 dark:text-amber-400 mt-1">{pending}</p>
         </div>
+        <div className={`rounded-xl p-4 border ${resetPending > 0 ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800'}`}>
+          <p className="text-sm text-slate-500 dark:text-slate-400">Permintaan Reset</p>
+          <p className={`text-2xl font-bold mt-1 ${resetPending > 0 ? 'text-red-600 dark:text-red-400' : 'text-slate-900 dark:text-white'}`}>{resetPending}</p>
+        </div>
       </div>
+
+      {/* Reset Password Requests Banner */}
+      {resetPending > 0 && (
+        <div className="flex items-center gap-3 p-4 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
+          <KeyRound size={18} className="text-red-600 dark:text-red-400 shrink-0" />
+          <p className="text-sm text-red-700 dark:text-red-300 font-medium">
+            {resetPending} pemohon meminta reset password. Tinjau dan setujui/tolak di tabel di bawah.
+          </p>
+        </div>
+      )}
 
       {/* Table */}
       <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
@@ -104,13 +147,17 @@ export default function AdminAkunPage() {
                 <th className="px-4 py-3 text-left">Nama</th>
                 <th className="px-4 py-3 text-left">Email</th>
                 <th className="px-4 py-3 text-left">Tanggal Daftar</th>
-                <th className="px-4 py-3 text-center">Status</th>
-                <th className="px-4 py-3 text-center">Aksi</th>
+                <th className="px-4 py-3 text-center">Status Akun</th>
+                <th className="px-4 py-3 text-center">Reset Password</th>
+                <th className="px-4 py-3 text-center">Aksi Akun</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {users.map(user => (
-                <tr key={user.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                <tr
+                  key={user.id}
+                  className={`transition-colors ${user.resetRequested ? 'bg-red-50/50 dark:bg-red-900/10 hover:bg-red-50 dark:hover:bg-red-900/20' : 'hover:bg-slate-50 dark:hover:bg-slate-800/40'}`}
+                >
                   <td className="px-4 py-3 font-medium text-slate-900 dark:text-white">{user.nama}</td>
                   <td className="px-4 py-3 text-slate-500 dark:text-slate-400">{user.email}</td>
                   <td className="px-4 py-3 text-slate-500 dark:text-slate-400">
@@ -125,6 +172,31 @@ export default function AdminAkunPage() {
                       <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400">
                         <XCircle size={11} /> Menunggu
                       </span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    {user.resetRequested ? (
+                      <div className="flex items-center justify-center gap-1.5">
+                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400">
+                          <KeyRound size={10} /> Diminta
+                        </span>
+                        <button
+                          onClick={() => handleApproveReset(user)}
+                          disabled={resetting === user.id}
+                          className="px-2 py-1 rounded text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors disabled:opacity-50"
+                        >
+                          {resetting === user.id ? '...' : 'Setujui'}
+                        </button>
+                        <button
+                          onClick={() => handleRejectReset(user)}
+                          disabled={resetting === user.id}
+                          className="px-2 py-1 rounded text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors disabled:opacity-50"
+                        >
+                          Tolak
+                        </button>
+                      </div>
+                    ) : (
+                      <span className="text-xs text-slate-400">—</span>
                     )}
                   </td>
                   <td className="px-4 py-3 text-center">

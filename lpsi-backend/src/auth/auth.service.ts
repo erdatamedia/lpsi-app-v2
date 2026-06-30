@@ -64,31 +64,40 @@ export class AuthService {
   async forgotPassword(email: string) {
     const user = await this.prisma.user.findUnique({ where: { email } });
     if (!user) throw new NotFoundException('Email tidak ditemukan');
+    if (!user.isActive) throw new BadRequestException('Akun belum aktif');
 
-    const token = uuidv4();
-    await this.prisma.user.update({ where: { id: user.id }, data: { resetToken: token } });
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { resetRequested: true, resetToken: null },
+    });
 
-    const resetUrl = `${this.config.get('APP_URL')}/reset-password?token=${token}`;
-    try {
-      await this.mailer.sendMail({
-        to: user.email,
-        subject: 'Reset Password LPSI',
-        template: 'reset-password',
-        context: { nama: user.nama, resetUrl },
-      });
-    } catch {}
+    return {
+      statusCode: 200,
+      message: 'Permintaan reset password telah dikirim. Silakan hubungi admin dan kembali ke halaman ini untuk mengecek status persetujuan.',
+    };
+  }
 
-    return { statusCode: 200, message: 'Link reset password telah dikirim ke email Anda.' };
+  async checkResetStatus(email: string) {
+    const user = await this.prisma.user.findUnique({ where: { email } });
+    if (!user) throw new NotFoundException('Email tidak ditemukan');
+
+    if (user.resetToken) {
+      return { statusCode: 200, data: { status: 'APPROVED', token: user.resetToken } };
+    }
+    if (user.resetRequested) {
+      return { statusCode: 200, data: { status: 'PENDING' } };
+    }
+    return { statusCode: 200, data: { status: 'NONE' } };
   }
 
   async resetPassword(dto: ResetPasswordDto) {
     const user = await this.prisma.user.findFirst({ where: { resetToken: dto.token } });
-    if (!user) throw new BadRequestException('Token reset password tidak valid');
+    if (!user) throw new BadRequestException('Token reset password tidak valid atau sudah digunakan');
 
     const hash = await bcrypt.hash(dto.password, 12);
     await this.prisma.user.update({
       where: { id: user.id },
-      data: { password: hash, resetToken: null },
+      data: { password: hash, resetToken: null, resetRequested: false },
     });
 
     return { statusCode: 200, message: 'Password berhasil direset. Silakan login.' };

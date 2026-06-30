@@ -47,6 +47,9 @@ export class AnalysisController {
     if (!request) throw new NotFoundException('Permohonan tidak ditemukan');
     if (!request.suratPengantar) throw new NotFoundException('Surat pengantar tidak tersedia');
     const uploadDir = this.config.get<string>('UPLOAD_DIR') ?? './uploads';
+    const filename = `surat-pengantar-${request.nomorPermohonan}.pdf`;
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `inline; filename="${filename}"`);
     return res.sendFile(request.suratPengantar, { root: join(process.cwd(), uploadDir) });
   }
 }

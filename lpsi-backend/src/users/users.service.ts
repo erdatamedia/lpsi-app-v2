@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { v4 as uuidv4 } from 'uuid';
 import type { User } from '@prisma/client';
 
 export interface UpdateProfileDto {
@@ -33,10 +34,33 @@ export class UsersService {
   async listUsers() {
     const users = await this.prisma.user.findMany({
       where: { role: 'PEMOHON' },
-      select: { id: true, nama: true, email: true, isActive: true, createdAt: true },
+      select: { id: true, nama: true, email: true, isActive: true, resetRequested: true, createdAt: true },
       orderBy: { createdAt: 'desc' },
     });
     return { statusCode: 200, message: 'Daftar akun pemohon', data: users };
+  }
+
+  async approveReset(id: number) {
+    const user = await this.prisma.user.findUnique({ where: { id } });
+    if (!user) throw new NotFoundException('User tidak ditemukan');
+
+    const token = uuidv4();
+    await this.prisma.user.update({
+      where: { id },
+      data: { resetToken: token, resetRequested: false },
+    });
+    return { statusCode: 200, message: 'Permintaan reset password disetujui. Pemohon dapat mereset password sekarang.' };
+  }
+
+  async rejectReset(id: number) {
+    const user = await this.prisma.user.findUnique({ where: { id } });
+    if (!user) throw new NotFoundException('User tidak ditemukan');
+
+    await this.prisma.user.update({
+      where: { id },
+      data: { resetRequested: false, resetToken: null },
+    });
+    return { statusCode: 200, message: 'Permintaan reset password ditolak.' };
   }
 
   async toggleActivate(id: number) {

@@ -21,6 +21,7 @@ const statusColor: Record<RequestStatus, string> = {
   MENUNGGU_SAMPEL: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
   SAMPEL_DITERIMA: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
   VERIFIKASI: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300',
+  MENUNGGU_BILLING: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300',
   MENUNGGU_PEMBAYARAN: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300',
   LUNAS: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
   ON_PROGRESS: 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300',
@@ -35,7 +36,7 @@ const sampleColor: Record<SampleStatus, string> = {
 };
 
 const REQUEST_STATUSES: RequestStatus[] = [
-  'MENUNGGU_SAMPEL', 'SAMPEL_DITERIMA', 'VERIFIKASI', 'MENUNGGU_PEMBAYARAN', 'LUNAS', 'ON_PROGRESS', 'SELESAI',
+  'MENUNGGU_SAMPEL', 'SAMPEL_DITERIMA', 'VERIFIKASI', 'MENUNGGU_BILLING', 'MENUNGGU_PEMBAYARAN', 'LUNAS', 'ON_PROGRESS', 'SELESAI',
 ];
 
 type TabId = 'detail' | 'verifikasi' | 'billing' | 'lhp' | 'riwayat';
@@ -74,8 +75,8 @@ const TABS: TabDef[] = [
     id: 'billing',
     label: 'Billing & Bayar',
     icon: <CreditCard size={15} />,
-    unlocked: (r) => ['VERIFIKASI', 'MENUNGGU_PEMBAYARAN', 'LUNAS', 'ON_PROGRESS', 'SELESAI'].includes(r.status),
-    autoOn: (r) => ['MENUNGGU_PEMBAYARAN', 'LUNAS'].includes(r.status),
+    unlocked: (r) => ['VERIFIKASI', 'MENUNGGU_BILLING', 'MENUNGGU_PEMBAYARAN', 'LUNAS', 'ON_PROGRESS', 'SELESAI'].includes(r.status),
+    autoOn: (r) => ['MENUNGGU_BILLING', 'MENUNGGU_PEMBAYARAN', 'LUNAS'].includes(r.status),
   },
   {
     id: 'lhp',
@@ -103,7 +104,6 @@ export default function AdminDetailPermohonanPage() {
   const [newStatus, setNewStatus] = useState<RequestStatus | ''>('');
   const [updatingStatus, setUpdatingStatus] = useState(false);
 
-  const [billing, setBilling] = useState({ kodeBilling: '', totalTagihan: '' });
   const [billingFile, setBillingFile] = useState<File | null>(null);
   const billingFileRef = useRef<HTMLInputElement>(null);
   const [savingBilling, setSavingBilling] = useState(false);
@@ -164,15 +164,13 @@ export default function AdminDetailPermohonanPage() {
   }
 
   async function handleSaveBilling() {
-    if (!billing.kodeBilling || !billing.totalTagihan) { toast.error('Kode billing dan total tagihan wajib diisi'); return; }
+    if (!billingFile) { toast.error('File PDF e-billing wajib diunggah'); return; }
     setSavingBilling(true);
     try {
       const form = new FormData();
-      form.append('kodeBilling', billing.kodeBilling);
-      form.append('totalTagihan', billing.totalTagihan);
-      if (billingFile) form.append('eBillingFile', billingFile);
+      form.append('eBillingFile', billingFile);
       await api.post(`/admin/requests/${id}/billing`, form);
-      toast.success('Billing berhasil disimpan & notifikasi dikirim ke pemohon');
+      toast.success('E-billing berhasil diunggah & notifikasi dikirim ke pemohon');
       setBillingFile(null);
       if (billingFileRef.current) billingFileRef.current.value = '';
       await fetchRequest();
@@ -437,69 +435,53 @@ export default function AdminDetailPermohonanPage() {
           {/* ── TAB 3: BILLING & PEMBAYARAN ── */}
           {activeTab === 'billing' && (
             <div className="space-y-4">
-              {/* Form input billing — hanya saat VERIFIKASI */}
-              {request.status === 'VERIFIKASI' && (
+              {/* Upload e-billing — saat VERIFIKASI atau MENUNGGU_BILLING */}
+              {['VERIFIKASI', 'MENUNGGU_BILLING'].includes(request.status) && (
                 <div className="space-y-3 p-4 bg-slate-50 dark:bg-slate-900 rounded-xl">
-                  <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Input Kode Billing</p>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-1.5">
-                      <Label className="text-xs text-slate-700 dark:text-slate-300">Kode Billing <span className="text-red-500">*</span></Label>
-                      <Input placeholder="Kode dari sistem PNBP" value={billing.kodeBilling}
-                        onChange={(e) => setBilling({ ...billing, kodeBilling: e.target.value })}
-                        className="dark:bg-slate-800 dark:border-slate-600 dark:text-white" />
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label className="text-xs text-slate-700 dark:text-slate-300">Total Tagihan (Rp) <span className="text-red-500">*</span></Label>
-                      <Input type="number" placeholder="0" value={billing.totalTagihan}
-                        onChange={(e) => setBilling({ ...billing, totalTagihan: e.target.value })}
-                        className="dark:bg-slate-800 dark:border-slate-600 dark:text-white" />
-                    </div>
-                  </div>
+                  <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Upload E-Billing</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Upload file PDF e-billing dari sistem PNBP. Pemohon akan mendapat notifikasi dan dapat mengunduh file ini.</p>
                   <div className="space-y-1.5">
-                    <Label className="text-xs text-slate-700 dark:text-slate-300">Upload PDF E-Billing (opsional)</Label>
+                    <Label className="text-xs text-slate-700 dark:text-slate-300">File PDF E-Billing <span className="text-red-500">*</span></Label>
                     <input type="file" accept=".pdf" ref={billingFileRef}
                       onChange={e => setBillingFile(e.target.files?.[0] ?? null)}
                       className="block w-full text-xs text-slate-500 dark:text-slate-400 file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-medium file:bg-blue-50 file:text-blue-700 dark:file:bg-blue-900/30 dark:file:text-blue-300" />
                     {billingFile && <p className="text-xs text-blue-600 dark:text-blue-400">{billingFile.name}</p>}
                   </div>
                   <Button onClick={handleSaveBilling} disabled={savingBilling} size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
-                    {savingBilling ? <Loader2 size={13} className="animate-spin mr-1.5" /> : null}
-                    {savingBilling ? 'Menyimpan...' : 'Simpan & Kirim ke Pemohon'}
+                    {savingBilling ? <Loader2 size={13} className="animate-spin mr-1.5" /> : <Upload size={13} className="mr-1.5" />}
+                    {savingBilling ? 'Mengunggah...' : 'Upload & Kirim ke Pemohon'}
                   </Button>
                 </div>
               )}
 
-              {/* Info billing tersimpan */}
-              {request.totalTagihan && (
+              {/* Info e-billing & bukti bayar */}
+              {(request as LabRequest & { eBillingFile?: string }).eBillingFile && (
                 <div className="space-y-3">
-                  <div className="bg-slate-50 dark:bg-slate-900 rounded-xl p-4 space-y-2 text-sm">
-                    <div className="flex justify-between items-center">
-                      <span className="text-slate-500 dark:text-slate-400">Kode Billing</span>
-                      <span className="font-mono font-bold text-slate-900 dark:text-white">{request.kodeBilling}</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-slate-500 dark:text-slate-400">Total Tagihan</span>
-                      <span className="font-extrabold text-base text-slate-900 dark:text-white">
-                        Rp {Number(request.totalTagihan).toLocaleString('id-ID')}
-                      </span>
-                    </div>
-                  </div>
-
                   <div className="flex flex-wrap gap-2">
-                    {(request as LabRequest & { eBillingFile?: string }).eBillingFile && (
-                      <Button size="sm" variant="outline"
-                        onClick={() => {
+                    <Button size="sm" variant="outline"
+                      onClick={async () => {
+                        try {
+                          const res = await api.get(`/admin/requests/${id}/ebilling`, { responseType: 'blob' });
+                          const url = URL.createObjectURL(res.data);
+                          window.open(url, '_blank');
+                        } catch { toast.error('Gagal memuat e-billing'); }
+                      }}
+                      className="dark:border-slate-600 dark:text-slate-300">
+                      <Eye size={13} className="mr-1.5" /> Lihat E-Billing
+                    </Button>
+                    <Button size="sm" variant="outline"
+                      onClick={async () => {
+                        try {
+                          const res = await api.get(`/admin/requests/${id}/ebilling`, { responseType: 'blob' });
                           const a = document.createElement('a');
-                          api.get(`/admin/requests/${id}/ebilling`, { responseType: 'blob' }).then(res => {
-                            a.href = URL.createObjectURL(res.data);
-                            a.download = `ebilling-${request.nomorPermohonan}.pdf`;
-                            a.click();
-                          });
-                        }}
-                        className="dark:border-slate-600 dark:text-slate-300">
-                        <Download size={13} className="mr-1.5" /> E-Billing PDF
-                      </Button>
-                    )}
+                          a.href = URL.createObjectURL(res.data);
+                          a.download = `ebilling-${request.nomorPermohonan}.pdf`;
+                          a.click();
+                        } catch { toast.error('Gagal mengunduh e-billing'); }
+                      }}
+                      className="dark:border-slate-600 dark:text-slate-300">
+                      <Download size={13} className="mr-1.5" /> Unduh E-Billing
+                    </Button>
                     {request.buktiBayar ? (
                       <Button size="sm" variant="outline" disabled={loadingBukti}
                         onClick={async () => {
