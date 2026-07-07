@@ -12,7 +12,7 @@ CREATE TABLE `SkmPertanyaan` (
   PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
-INSERT INTO `Setting` (`key`, `value`) VALUES ('nomorPrefix', 'LPSI');
+INSERT INTO `Setting` (`key`, `value`) VALUES ('nomorPrefix', 'SIPUJA');
 
 INSERT INTO `SkmPertanyaan` (`label`, `urutan`) VALUES
   ('Kemudahan prosedur permohonan pengujian', 1),

@@ -23,7 +23,7 @@ export default function AdminKonfigurasiPage() {
 
   useEffect(() => {
     api.get('/admin/dashboard/settings/nomorPrefix').then(({ data }) => {
-      const val = data.data?.value ?? 'LPSI';
+      const val = data.data?.value ?? 'SIPUJA';
       setPrefix(val);
       setPrefixInput(val);
     }).catch(() => {});
@@ -102,7 +102,7 @@ export default function AdminKonfigurasiPage() {
             <Input
               value={prefixInput}
               onChange={e => setPrefixInput(e.target.value.toUpperCase())}
-              placeholder="LPSI"
+              placeholder="SIPUJA"
               className="font-mono dark:bg-slate-900 dark:border-slate-600 dark:text-white"
               maxLength={10}
             />
@@ -113,7 +113,7 @@ export default function AdminKonfigurasiPage() {
             Simpan
           </Button>
         </div>
-        <p className="text-xs text-slate-400">Contoh hasil: <span className="font-mono font-semibold text-slate-600 dark:text-slate-300">{prefixInput || 'LPSI'}-{new Date().toLocaleDateString('id-ID', { year: '2-digit', month: '2-digit' }).replace('/', '')}-001</span></p>
+        <p className="text-xs text-slate-400">Contoh hasil: <span className="font-mono font-semibold text-slate-600 dark:text-slate-300">{prefixInput || 'SIPUJA'}-{new Date().toLocaleDateString('id-ID', { year: '2-digit', month: '2-digit' }).replace('/', '')}-001</span></p>
       </div>
 
       {/* SKM Pertanyaan */}

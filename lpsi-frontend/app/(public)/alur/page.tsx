@@ -7,7 +7,7 @@ const steps = [
   {
     no: 1,
     title: 'Registrasi & Login',
-    desc: 'Daftar akun pemohon di portal LPSI, aktivasi via email, lalu login.',
+    desc: 'Daftar akun pemohon di portal SIPUJA, aktivasi via email, lalu login.',
     detail: 'Akun digunakan untuk melacak semua permohonan dan menerima notifikasi status.',
     color: 'bg-blue-600',
   },
@@ -60,8 +60,8 @@ export default function AlurPage() {
     <div className="min-h-screen flex flex-col bg-white">
       <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-slate-100 px-5 py-3.5 flex justify-between items-center">
         <div className="flex items-center gap-2.5">
-          <Image src="/favicon.svg" alt="LPSI Logo" width={34} height={34} className="object-contain" />
-          <Link href="/" className="font-bold text-slate-900">LPSI</Link>
+          <Image src="/favicon.svg" alt="SIPUJA Logo" width={34} height={34} className="object-contain" />
+          <Link href="/" className="font-bold text-slate-900">SIPUJA</Link>
         </div>
         <div className="flex items-center gap-2">
           <Button asChild variant="ghost" size="sm"><Link href="/login">Masuk</Link></Button>
@@ -72,7 +72,7 @@ export default function AlurPage() {
       <main className="flex-1 max-w-2xl mx-auto w-full py-12 px-5 space-y-8">
         <div className="animate-slide-up">
           <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900">Alur Pengujian</h1>
-          <p className="text-slate-500 mt-2">Ikuti langkah-langkah berikut untuk menggunakan layanan pengujian laboratorium LPSI.</p>
+          <p className="text-slate-500 mt-2">Ikuti langkah-langkah berikut untuk menggunakan layanan pengujian laboratorium SIPUJA.</p>
         </div>
 
         <div className="relative animate-slide-up-delay-1">
@@ -101,7 +101,7 @@ export default function AlurPage() {
       </main>
 
       <footer className="border-t py-6 px-5 text-center text-xs text-slate-400 mt-auto">
-        © {new Date().getFullYear()} LPSI — Layanan Pelacakan Hasil Lab
+        © {new Date().getFullYear()} SIPUJA — Sistem Pengujian Hasil Lab
       </footer>
     </div>
   );

@@ -7,8 +7,8 @@ import { ThemeProvider } from '@/components/ThemeProvider';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'LPSI — Layanan Pelacakan Hasil Lab',
-  description: 'Sistem pelacakan hasil laboratorium LPSI',
+  title: 'SIPUJA — Sistem Pengujian Hasil Lab',
+  description: 'Sistem Pengujian Hasil Lab SIPUJA',
   icons: {
     icon: '/favicon.svg',
     shortcut: '/favicon.svg',

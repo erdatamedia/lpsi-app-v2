@@ -37,7 +37,7 @@ export default function DashboardPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white">Dashboard</h1>
-          <p className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">Selamat datang kembali di portal LPSI.</p>
+          <p className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">Selamat datang kembali di portal SIPUJA.</p>
         </div>
         <Button asChild className="bg-blue-600 hover:bg-blue-700 text-white font-semibold w-full sm:w-auto">
           <Link href="/permohonan/baru"><Plus size={16} className="mr-1.5" />Buat Permohonan</Link>

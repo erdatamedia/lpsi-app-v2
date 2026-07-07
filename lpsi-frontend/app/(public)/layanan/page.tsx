@@ -35,8 +35,8 @@ export default function LayananPage() {
     <div className="min-h-screen flex flex-col bg-white dark:bg-slate-950">
       <nav className="sticky top-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur border-b border-slate-100 dark:border-slate-800 px-5 py-3.5 flex justify-between items-center">
         <div className="flex items-center gap-2.5">
-          <Image src="/favicon.svg" alt="LPSI Logo" width={34} height={34} className="object-contain" />
-          <Link href="/" className="font-bold text-slate-900 dark:text-white">LPSI</Link>
+          <Image src="/favicon.svg" alt="SIPUJA Logo" width={34} height={34} className="object-contain" />
+          <Link href="/" className="font-bold text-slate-900 dark:text-white">SIPUJA</Link>
         </div>
         <div className="flex items-center gap-2">
           <Button asChild variant="ghost" size="sm"><Link href="/login">Masuk</Link></Button>
@@ -47,7 +47,7 @@ export default function LayananPage() {
       <main className="flex-1 max-w-5xl mx-auto w-full py-12 px-5 space-y-10">
         <div className="animate-slide-up">
           <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white">Layanan Pengujian</h1>
-          <p className="text-slate-500 dark:text-slate-400 mt-2 text-base">Laboratorium LPSI menyediakan layanan analisis berikut:</p>
+          <p className="text-slate-500 dark:text-slate-400 mt-2 text-base">Laboratorium SIPUJA menyediakan layanan analisis berikut:</p>
         </div>
 
         {loading ? (
@@ -108,7 +108,7 @@ export default function LayananPage() {
       </main>
 
       <footer className="border-t border-slate-100 dark:border-slate-800 py-6 px-5 text-center text-xs text-slate-400 mt-auto">
-        © {new Date().getFullYear()} LPSI — Layanan Pelacakan Hasil Lab
+        © {new Date().getFullYear()} SIPUJA — Sistem Pengujian Hasil Lab
       </footer>
     </div>
   );

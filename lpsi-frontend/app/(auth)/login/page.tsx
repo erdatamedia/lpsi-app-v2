@@ -33,7 +33,7 @@ export default function LoginPage() {
     <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm p-8">
       <div className="mb-7">
         <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white">Selamat Datang</h1>
-        <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Masuk ke portal LPSI untuk melanjutkan.</p>
+        <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Masuk ke portal SIPUJA untuk melanjutkan.</p>
       </div>
       <form onSubmit={handleSubmit} className="space-y-5">
         <div className="space-y-1.5">
