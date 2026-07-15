@@ -1,13 +1,38 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import * as XLSX from 'xlsx';
+import { startOfMonth, endOfMonth, subMonths, differenceInDays, format } from 'date-fns';
+import { id as localeID } from 'date-fns/locale';
+
+const PERLU_TINDAKAN_STATUSES = [
+  'SAMPEL_DITERIMA',
+  'VERIFIKASI',
+  'MENUNGGU_BILLING',
+  'LUNAS',
+  'ON_PROGRESS',
+] as const;
 
 @Injectable()
 export class DashboardService {
   constructor(private prisma: PrismaService) {}
 
   async getMetrics() {
-    const [totalRequests, byStatus, totalRevenue, totalSamples] = await Promise.all([
+    const now = new Date();
+    const startThisMonth = startOfMonth(now);
+    const startLastMonth = startOfMonth(subMonths(now, 1));
+    const endLastMonth = endOfMonth(subMonths(now, 1));
+
+    const [
+      totalRequests,
+      byStatus,
+      totalRevenue,
+      totalSamples,
+      perluTindakan,
+      selesaiRequests,
+      permohonanBulanIni,
+      permohonanBulanLalu,
+      monthlyTrend,
+    ] = await Promise.all([
       this.prisma.labRequest.count(),
       this.prisma.labRequest.groupBy({ by: ['status'], _count: { status: true } }),
       this.prisma.labRequest.aggregate({
@@ -15,7 +40,28 @@ export class DashboardService {
         where: { status: { in: ['LUNAS', 'ON_PROGRESS', 'SELESAI'] } },
       }),
       this.prisma.sample.count(),
+      this.prisma.labRequest.count({ where: { status: { in: [...PERLU_TINDAKAN_STATUSES] } } }),
+      this.prisma.labRequest.findMany({
+        where: { status: 'SELESAI' },
+        select: { createdAt: true, updatedAt: true },
+      }),
+      this.prisma.labRequest.count({ where: { createdAt: { gte: startThisMonth } } }),
+      this.prisma.labRequest.count({ where: { createdAt: { gte: startLastMonth, lte: endLastMonth } } }),
+      Promise.all(
+        Array.from({ length: 6 }, async (_, i) => {
+          const target = subMonths(now, 5 - i);
+          const count = await this.prisma.labRequest.count({
+            where: { createdAt: { gte: startOfMonth(target), lte: endOfMonth(target) } },
+          });
+          return { label: format(target, 'MMM yyyy', { locale: localeID }), count };
+        }),
+      ),
     ]);
+
+    const avgProcessingDays = selesaiRequests.length
+      ? selesaiRequests.reduce((sum, r) => sum + differenceInDays(r.updatedAt, r.createdAt), 0) /
+        selesaiRequests.length
+      : 0;
 
     return {
       statusCode: 200,
@@ -25,6 +71,11 @@ export class DashboardService {
         byStatus: Object.fromEntries(byStatus.map((s) => [s.status, s._count.status])),
         totalRevenue: totalRevenue._sum.totalTagihan ?? 0,
         totalSamples,
+        perluTindakan,
+        avgProcessingDays: Math.round(avgProcessingDays * 10) / 10,
+        permohonanBulanIni,
+        permohonanBulanLalu,
+        monthlyTrend,
       },
     };
   }
