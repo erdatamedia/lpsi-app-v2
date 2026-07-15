@@ -1,11 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { toast } from 'sonner';
 import api from '@/lib/api';
 import { REQUEST_STATUS_LABEL, RequestStatus } from '@/lib/types';
-import { Button } from '@/components/ui/button';
-import { Download, Loader2, ClipboardList, FlaskConical, Banknote, TrendingUp } from 'lucide-react';
+import { ClipboardList, FlaskConical, Banknote, TrendingUp } from 'lucide-react';
 
 interface Metrics {
   totalRequests: number;
@@ -28,30 +26,12 @@ const statusColor: Record<RequestStatus, string> = {
 export default function AdminDashboardPage() {
   const [metrics, setMetrics] = useState<Metrics | null>(null);
   const [loading, setLoading] = useState(true);
-  const [exporting, setExporting] = useState(false);
 
   useEffect(() => {
     api.get('/admin/dashboard/metrics')
       .then(({ data }) => setMetrics(data.data))
       .finally(() => setLoading(false));
   }, []);
-
-  async function handleExport() {
-    setExporting(true);
-    try {
-      const res = await api.get('/admin/dashboard/export', { responseType: 'blob' });
-      const url = URL.createObjectURL(res.data);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `LPSI-Ekspor-${new Date().toISOString().slice(0, 10)}.xlsx`;
-      a.click();
-      URL.revokeObjectURL(url);
-    } catch {
-      toast.error('Gagal mengekspor data');
-    } finally {
-      setExporting(false);
-    }
-  }
 
   const cards = [
     { label: 'Total Permohonan', value: metrics?.totalRequests, icon: ClipboardList, color: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-900/30' },
@@ -67,20 +47,9 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="p-5 sm:p-7 space-y-6 animate-fade-in">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white">Dashboard Admin</h1>
-          <p className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">Ringkasan aktivitas sistem SIPUJA.</p>
-        </div>
-        <Button
-          variant="outline"
-          onClick={handleExport}
-          disabled={exporting}
-          className="border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 w-full sm:w-auto"
-        >
-          {exporting ? <Loader2 size={14} className="animate-spin mr-2" /> : <Download size={14} className="mr-2" />}
-          {exporting ? 'Mengekspor...' : 'Ekspor Excel'}
-        </Button>
+      <div>
+        <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white">Dashboard Admin</h1>
+        <p className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">Ringkasan aktivitas sistem SIPUJA.</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
