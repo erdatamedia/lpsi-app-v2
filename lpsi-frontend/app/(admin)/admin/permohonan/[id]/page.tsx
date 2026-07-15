@@ -14,7 +14,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import {
   ArrowLeft, Upload, Download, Loader2, CheckCircle2, AlertCircle,
-  Eye, X, Lock, FileText, ShieldCheck, CreditCard, FileCheck, History,
+  Eye, X, Lock, FileText, ShieldCheck, CreditCard, FileCheck, History, Trash2,
 } from 'lucide-react';
 
 const statusColor: Record<RequestStatus, string> = {
@@ -124,6 +124,9 @@ export default function AdminDetailPermohonanPage() {
   const [resiInput, setResiInput] = useState('');
   const [savingResi, setSavingResi] = useState(false);
 
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
   async function fetchRequest() {
     const { data } = await api.get(`/requests/${id}`);
     const req = data.data as LabRequest;
@@ -209,6 +212,18 @@ export default function AdminDetailPermohonanPage() {
     finally { setSavingVerif(false); }
   }
 
+  async function handleDelete() {
+    setDeleting(true);
+    try {
+      await api.delete(`/admin/requests/${id}`);
+      toast.success('Permohonan berhasil dihapus');
+      router.push('/admin/permohonan');
+    } catch (err) {
+      toast.error(getErrorMessage(err));
+      setDeleting(false);
+    }
+  }
+
   async function handleUploadLhp(sampleId: number, file: File) {
     setUploadingLhp(sampleId);
     try {
@@ -263,6 +278,12 @@ export default function AdminDetailPermohonanPage() {
             className="h-8 bg-blue-600 hover:bg-blue-700 text-white text-xs">
             {updatingStatus ? <Loader2 size={13} className="animate-spin" /> : 'Update'}
           </Button>
+          {request.status === 'MENUNGGU_SAMPEL' && (
+            <Button size="sm" variant="outline" onClick={() => setDeleteDialogOpen(true)}
+              className="h-8 px-2.5 border-red-200 text-red-600 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-900/20">
+              <Trash2 size={13} />
+            </Button>
+          )}
         </div>
       </div>
 
@@ -729,6 +750,26 @@ export default function AdminDetailPermohonanPage() {
             <Button onClick={handleVerifSampel} disabled={savingVerif} className="bg-blue-600 hover:bg-blue-700 text-white">
               {savingVerif ? <Loader2 size={13} className="animate-spin mr-1.5" /> : null}
               {savingVerif ? 'Menyimpan...' : 'Simpan'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog Konfirmasi Hapus Permohonan */}
+      <Dialog open={deleteDialogOpen} onOpenChange={(o) => !deleting && setDeleteDialogOpen(o)}>
+        <DialogContent className="dark:bg-slate-800 dark:border-slate-700">
+          <DialogHeader>
+            <DialogTitle className="dark:text-white">Hapus Permohonan?</DialogTitle>
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              Permohonan <strong>{request.nomorPermohonan}</strong> beserta seluruh data sampelnya akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.
+            </p>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)} disabled={deleting}
+              className="dark:border-slate-600 dark:text-slate-300">Batal</Button>
+            <Button onClick={handleDelete} disabled={deleting} className="bg-red-600 hover:bg-red-700 text-white">
+              {deleting ? <Loader2 size={13} className="animate-spin mr-1.5" /> : null}
+              {deleting ? 'Menghapus...' : 'Hapus Permohonan'}
             </Button>
           </DialogFooter>
         </DialogContent>

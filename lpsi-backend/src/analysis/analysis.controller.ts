@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Patch, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Res, UseGuards } from '@nestjs/common';
 import { AnalysisService } from './analysis.service';
 import { UpdateStatusDto } from './dto/update-status.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
@@ -28,6 +28,11 @@ export class AnalysisController {
   @Patch(':id/status')
   updateStatus(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateStatusDto) {
     return this.analysisService.updateStatus(id, dto.status);
+  }
+
+  @Delete(':id')
+  deleteRequest(@Param('id', ParseIntPipe) id: number) {
+    return this.analysisService.deleteRequest(id);
   }
 
   @Patch(':id/resi-lhp')

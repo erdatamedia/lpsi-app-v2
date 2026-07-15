@@ -1,9 +1,12 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { ActivityLogService } from '../activity-log/activity-log.service';
 import { REQUEST_STATUS_LABEL } from './constants';
 import type { RequestStatus } from '@prisma/client';
+import { ConfigService } from '@nestjs/config';
+import { unlink } from 'fs/promises';
+import { join } from 'path';
 
 @Injectable()
 export class AnalysisService {
@@ -11,6 +14,7 @@ export class AnalysisService {
     private prisma: PrismaService,
     private notifications: NotificationsService,
     private activityLog: ActivityLogService,
+    private config: ConfigService,
   ) {}
 
   async updateStatus(id: number, status: RequestStatus) {
@@ -88,5 +92,26 @@ export class AnalysisService {
       orderBy: { createdAt: 'desc' },
     });
     return { statusCode: 200, message: 'Daftar semua permohonan berhasil diambil', data: requests };
+  }
+
+  async deleteRequest(id: number) {
+    const request = await this.prisma.labRequest.findUnique({ where: { id } });
+    if (!request) throw new NotFoundException('Permohonan tidak ditemukan');
+    if (request.status !== 'MENUNGGU_SAMPEL')
+      throw new BadRequestException(
+        'Hanya permohonan berstatus "Menunggu Sampel" yang dapat dihapus',
+      );
+
+    if (request.suratPengantar) {
+      const uploadDir = this.config.get<string>('UPLOAD_DIR') ?? './uploads';
+      const root = uploadDir.startsWith('/') ? uploadDir : join(process.cwd(), uploadDir);
+      try {
+        await unlink(join(root, request.suratPengantar));
+      } catch {}
+    }
+
+    await this.prisma.labRequest.delete({ where: { id } });
+
+    return { statusCode: 200, message: `Permohonan ${request.nomorPermohonan} berhasil dihapus` };
   }
 }
