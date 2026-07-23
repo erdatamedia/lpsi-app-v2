@@ -63,9 +63,19 @@ export class RequestsController {
     @UploadedFile() file?: Express.Multer.File,
   ) {
     // samples dikirim sebagai JSON string dari FormData
+    const samples = typeof body.samples === 'string' ? JSON.parse(body.samples) : body.samples;
+    if (!Array.isArray(samples) || samples.length === 0) {
+      throw new BadRequestException('Minimal 1 sampel harus diisi');
+    }
+    if (samples.length > 5) {
+      throw new BadRequestException('Maksimal 5 sampel per permohonan');
+    }
+
+    // FormData mengirim boolean sebagai string, harus dikonversi manual
     const dto: CreateRequestDto = {
       ...body,
-      samples: typeof body.samples === 'string' ? JSON.parse(body.samples) : body.samples,
+      kirimLhpFisik: body.kirimLhpFisik === 'true',
+      samples,
     } as CreateRequestDto;
     return this.requestsService.create(dto, user, file?.filename);
   }

@@ -279,7 +279,13 @@ export default function BuatPermohonanPage() {
     setSamples(prev => prev.map((s, i) => i === index ? { ...s, [field]: value } : s));
   }
 
+  const MAX_SAMPLES = 5;
+
   function addSample() {
+    if (samples.length >= MAX_SAMPLES) {
+      toast.error(`Maksimal ${MAX_SAMPLES} sampel per permohonan`);
+      return;
+    }
     setSamples(prev => [...prev, emptySample()]);
   }
 
@@ -292,6 +298,10 @@ export default function BuatPermohonanPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
+    if (samples.length > MAX_SAMPLES) {
+      toast.error(`Maksimal ${MAX_SAMPLES} sampel per permohonan`);
+      return;
+    }
     for (const s of samples) {
       if (!s.kategori) { toast.error('Pilih kategori untuk setiap sampel'); return; }
       if (!s.namaSampel) { toast.error('Isi nama sampel untuk setiap sampel'); return; }
@@ -399,9 +409,11 @@ export default function BuatPermohonanPage() {
           <div className="flex items-center justify-between">
             <div>
               <h2 className="font-bold text-slate-900 dark:text-white text-base">Sampel</h2>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Tambah sampel yang akan diuji</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Tambah sampel yang akan diuji ({samples.length}/{MAX_SAMPLES})
+              </p>
             </div>
-            <Button type="button" onClick={addSample} size="sm"
+            <Button type="button" onClick={addSample} size="sm" disabled={samples.length >= MAX_SAMPLES}
               className="bg-blue-600 hover:bg-blue-700 text-white">
               <Plus size={14} className="mr-1.5" /> Tambah Sampel
             </Button>
