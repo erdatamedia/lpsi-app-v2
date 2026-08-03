@@ -103,7 +103,7 @@ export default function AdminLayananPage() {
   }
 
   return (
-    <div className="p-5 sm:p-7 space-y-5 max-w-3xl animate-fade-in">
+    <div className="p-5 sm:p-7 space-y-5 animate-fade-in">
       <div>
         <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white">Kelola Layanan</h1>
         <p className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">Tambah, ubah, atau hapus kategori dan item layanan pengujian.</p>

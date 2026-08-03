@@ -78,7 +78,7 @@ export default function AdminAkunPage() {
   const resetPending = users.filter(u => u.resetRequested).length;
 
   return (
-    <div className="p-6 max-w-5xl mx-auto space-y-6">
+    <div className="p-5 sm:p-7 space-y-6 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
