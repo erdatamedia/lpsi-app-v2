@@ -69,9 +69,10 @@ export class SamplesService {
           `Verifikasi selesai — sampel ${namaditolak} tidak lolos. Pemohon diminta mengirim ulang sampel.`,
         );
       } else {
+        const totalTagihan = allSamples.reduce((sum, s) => sum + Number(s.hargaTotal), 0);
         await this.prisma.labRequest.update({
           where: { id: sample.requestId },
-          data: { status: 'VERIFIKASI' },
+          data: { status: 'VERIFIKASI', totalTagihan },
         });
         await this.activityLog.log(
           sample.requestId,
