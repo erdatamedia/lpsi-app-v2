@@ -100,7 +100,7 @@ const TABS: TabDef[] = [
 export default function DetailPermohonanPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
-  const [request, setRequest] = useState<LabRequest & { ikm?: object }>();
+  const [request, setRequest] = useState<LabRequest>();
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<TabId>('detail');
   const [uploading, setUploading] = useState(false);

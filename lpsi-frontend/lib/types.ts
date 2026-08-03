@@ -59,6 +59,11 @@ export interface LabRequest {
   createdAt: string;
   updatedAt: string;
   samples: Sample[];
+  ikm?: {
+    id: number;
+    jawaban: Record<string, string>;
+    createdAt: string;
+  } | null;
 }
 
 export interface Notification {

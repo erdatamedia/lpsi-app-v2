@@ -14,8 +14,17 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import {
   ArrowLeft, Upload, Download, Loader2, CheckCircle2, AlertCircle,
-  Eye, X, Lock, FileText, ShieldCheck, CreditCard, FileCheck, History, Trash2,
+  Eye, X, Lock, FileText, ShieldCheck, CreditCard, FileCheck, History, Trash2, Star,
 } from 'lucide-react';
+
+interface SkmPertanyaan { id: number; label: string; }
+
+const IKM_OPTIONS: Record<string, string> = {
+  '1': 'Tidak Baik',
+  '2': 'Kurang Baik',
+  '3': 'Baik',
+  '4': 'Sangat Baik',
+};
 
 const statusColor: Record<RequestStatus, string> = {
   MENUNGGU_SAMPEL: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
@@ -39,7 +48,7 @@ const REQUEST_STATUSES: RequestStatus[] = [
   'MENUNGGU_SAMPEL', 'SAMPEL_DITERIMA', 'VERIFIKASI', 'MENUNGGU_BILLING', 'MENUNGGU_PEMBAYARAN', 'LUNAS', 'ON_PROGRESS', 'SELESAI',
 ];
 
-type TabId = 'detail' | 'verifikasi' | 'billing' | 'lhp' | 'riwayat';
+type TabId = 'detail' | 'verifikasi' | 'billing' | 'lhp' | 'skm' | 'riwayat';
 
 interface ActivityLog {
   id: number;
@@ -86,6 +95,13 @@ const TABS: TabDef[] = [
     autoOn: (r) => ['ON_PROGRESS', 'SELESAI'].includes(r.status),
   },
   {
+    id: 'skm',
+    label: 'SKM',
+    icon: <Star size={15} />,
+    unlocked: (r) => !!r.ikm,
+    autoOn: () => false,
+  },
+  {
     id: 'riwayat',
     label: 'Riwayat',
     icon: <History size={15} />,
@@ -126,6 +142,12 @@ export default function AdminDetailPermohonanPage() {
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
+
+  const [skmPertanyaan, setSkmPertanyaan] = useState<SkmPertanyaan[]>([]);
+
+  useEffect(() => {
+    api.get('/requests/meta/skm-pertanyaan').then(({ data }) => setSkmPertanyaan(data.data ?? [])).catch(() => {});
+  }, []);
 
   async function fetchRequest() {
     const { data } = await api.get(`/requests/${id}`);
@@ -670,6 +692,48 @@ export default function AdminDetailPermohonanPage() {
                     )
                   )}
                 </div>
+              )}
+            </div>
+          )}
+
+          {/* ── TAB 5: SKM ── */}
+          {activeTab === 'skm' && (
+            <div className="space-y-4">
+              {request.ikm ? (
+                <>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    Diisi oleh pemohon pada{' '}
+                    {new Date(request.ikm.createdAt).toLocaleDateString('id-ID', {
+                      day: 'numeric', month: 'long', year: 'numeric',
+                    })}{' '}
+                    {new Date(request.ikm.createdAt).toLocaleTimeString('id-ID', {
+                      hour: '2-digit', minute: '2-digit',
+                    })} WIB
+                  </p>
+                  <div className="space-y-2.5">
+                    {skmPertanyaan.map((p, i) => {
+                      const jawaban = request.ikm?.jawaban[`p${p.id}`];
+                      return (
+                        <div key={p.id} className="border border-slate-100 dark:border-slate-700 rounded-lg p-3.5">
+                          <p className="text-sm text-slate-700 dark:text-slate-300">{i + 1}. {p.label}</p>
+                          <p className="text-sm font-semibold text-blue-700 dark:text-blue-400 mt-1">
+                            {jawaban ? IKM_OPTIONS[jawaban] ?? jawaban : '—'}
+                          </p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {request.ikm.jawaban.saran && (
+                    <div className="border-t border-slate-100 dark:border-slate-700 pt-4">
+                      <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide mb-2">Saran / Masukan</p>
+                      <p className="text-sm text-slate-700 dark:text-slate-300 whitespace-pre-wrap">{request.ikm.jawaban.saran}</p>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <p className="text-sm text-slate-400 dark:text-slate-500 text-center py-8">
+                  Pemohon belum mengisi Survei Kepuasan Masyarakat (SKM).
+                </p>
               )}
             </div>
           )}
