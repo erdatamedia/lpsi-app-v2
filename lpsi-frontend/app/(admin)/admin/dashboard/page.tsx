@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import api from '@/lib/api';
 import { REQUEST_STATUS_LABEL, RequestStatus } from '@/lib/types';
 import {
-  ClipboardList, FlaskConical, Banknote, TrendingUp, ListTodo, Clock, CalendarDays, BarChart3,
+  ClipboardList, FlaskConical, Banknote, TrendingUp, ListTodo, Clock, CalendarDays, BarChart3, CheckCircle2,
 } from 'lucide-react';
 
 interface MonthlyTrendPoint {
@@ -291,13 +291,23 @@ export default function AdminDashboardPage() {
     {
       label: 'Perlu Tindakan',
       value: metrics?.perluTindakan,
-      icon: ListTodo,
-      color: 'text-orange-600 dark:text-orange-400',
-      bg: 'bg-orange-50 dark:bg-orange-900/30',
+      icon: metrics && metrics.perluTindakan === 0 ? CheckCircle2 : ListTodo,
+      color: metrics && metrics.perluTindakan === 0
+        ? 'text-green-600 dark:text-green-400'
+        : 'text-orange-600 dark:text-orange-400',
+      bg: metrics && metrics.perluTindakan === 0
+        ? 'bg-green-50 dark:bg-green-900/30'
+        : 'bg-orange-50 dark:bg-orange-900/30',
+      delta: metrics && metrics.perluTindakan === 0 ? 'Semua permohonan sudah tertangani' : undefined,
+      deltaColor: 'text-green-600 dark:text-green-400',
     },
     {
       label: 'Rata-rata Waktu Proses',
-      value: metrics ? (hasSelesai ? `${metrics.avgProcessingDays} hari` : '—') : null,
+      value: metrics
+        ? hasSelesai
+          ? metrics.avgProcessingDays === 0 ? '<1 hari' : `${metrics.avgProcessingDays} hari`
+          : '—'
+        : null,
       icon: Clock,
       color: 'text-cyan-600 dark:text-cyan-400',
       bg: 'bg-cyan-50 dark:bg-cyan-900/30',
@@ -311,9 +321,11 @@ export default function AdminDashboardPage() {
       delta: metrics
         ? bulanDelta === 0
           ? 'Sama dengan bulan lalu'
-          : `${bulanDelta > 0 ? '▲' : '▼'} ${Math.abs(bulanDelta)} dari bulan lalu`
+          : bulanDelta > 0
+            ? `▲ ${bulanDelta} lebih banyak dari bulan lalu`
+            : `${Math.abs(bulanDelta)} lebih sedikit dari bulan lalu`
         : undefined,
-      deltaColor: bulanDelta > 0 ? 'text-green-600 dark:text-green-400' : bulanDelta < 0 ? 'text-slate-400 dark:text-slate-500' : 'text-slate-400 dark:text-slate-500',
+      deltaColor: bulanDelta > 0 ? 'text-green-600 dark:text-green-400' : 'text-slate-400 dark:text-slate-500',
     },
   ];
 
