@@ -189,7 +189,7 @@ export default function DetailPermohonanPage() {
   const verifikasiOK = ['VERIFIKASI', 'MENUNGGU_BILLING', 'MENUNGGU_PEMBAYARAN', 'LUNAS', 'ON_PROGRESS', 'SELESAI'].includes(request.status);
 
   return (
-    <div className="p-5 sm:p-7 max-w-3xl space-y-5 animate-fade-in">
+    <div className="p-5 sm:p-7 max-w-4xl mx-auto space-y-5 animate-fade-in">
       {/* Header */}
       <div className="flex items-center gap-3">
         <button

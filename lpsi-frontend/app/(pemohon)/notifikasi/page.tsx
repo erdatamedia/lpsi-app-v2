@@ -35,7 +35,7 @@ export default function NotifikasiPage() {
   const unread = notifs.filter((n) => !n.isRead).length;
 
   return (
-    <div className="p-5 sm:p-7 space-y-5 max-w-2xl mx-auto animate-fade-in">
+    <div className="p-5 sm:p-7 space-y-5 max-w-4xl mx-auto animate-fade-in">
       <div className="flex items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white">Notifikasi</h1>

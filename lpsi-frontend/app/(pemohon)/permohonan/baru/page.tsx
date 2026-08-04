@@ -347,7 +347,7 @@ export default function BuatPermohonanPage() {
   }
 
   return (
-    <div className="p-5 sm:p-7 max-w-3xl space-y-6 animate-fade-in">
+    <div className="p-5 sm:p-7 max-w-4xl mx-auto space-y-6 animate-fade-in">
       <div>
         <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white">Buat Permohonan</h1>
         <p className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">Isi data permohonan pengujian laboratorium.</p>

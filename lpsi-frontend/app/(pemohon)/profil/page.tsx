@@ -73,7 +73,7 @@ export default function ProfilPage() {
   );
 
   return (
-    <div className="p-5 sm:p-7 space-y-5 max-w-lg mx-auto animate-fade-in">
+    <div className="p-5 sm:p-7 space-y-5 max-w-4xl mx-auto animate-fade-in">
       <div>
         <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white">Profil Saya</h1>
         <p className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">Informasi akun Anda di portal SIPUJA.</p>
