@@ -270,7 +270,7 @@ export default function AdminDetailPermohonanPage() {
   const sampelUntukLhp = request.samples.filter(s => s.status !== 'DITOLAK');
 
   return (
-    <div className="p-5 sm:p-7 max-w-3xl space-y-5 animate-fade-in">
+    <div className="p-5 sm:p-7 space-y-5 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
