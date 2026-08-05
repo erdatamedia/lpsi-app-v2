@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, X, ExternalLink } from 'lucide-react';
 import { Slideshow } from '@/components/Slideshow';
 import { ThemeToggle } from '@/components/ThemeToggle';
 
@@ -38,7 +38,7 @@ const cards = [
   },
   {
     key: 'DOKUMEN_ISO',
-    label: 'Dokumen ISO',
+    label: 'Dokumen',
     desc: 'Dokumen mutu dan sertifikasi laboratorium.',
     color: 'from-orange-500 to-orange-600',
     isLink: false,
@@ -49,6 +49,7 @@ export default function HomePage() {
   const [slides, setSlides] = useState<Slide[]>([]);
   const [cardMedia, setCardMedia] = useState<CardMedia[]>([]);
   const [layanan, setLayanan] = useState<Layanan[]>([]);
+  const [viewer, setViewer] = useState<{ url: string; label: string } | null>(null);
 
   const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001/api';
   const BASE = API.replace('/api', '');
@@ -114,9 +115,14 @@ export default function HomePage() {
               }
               if (mediaUrl) {
                 return (
-                  <a key={card.key} href={mediaUrl} target="_blank" rel="noopener noreferrer" className="block">
+                  <button
+                    key={card.key}
+                    type="button"
+                    onClick={() => setViewer({ url: mediaUrl, label: card.label })}
+                    className="block text-left w-full"
+                  >
                     {content}
-                  </a>
+                  </button>
                 );
               }
               return <div key={card.key} className="opacity-60">{content}</div>;
@@ -160,6 +166,48 @@ export default function HomePage() {
       <footer className="border-t dark:border-slate-800 py-6 px-5 text-center text-xs text-slate-400 mt-auto">
         © {new Date().getFullYear()} SIPUJA — Sistem Pengujian Hasil Lab
       </footer>
+
+      {/* Modal Lihat Dokumen */}
+      {viewer && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+          onClick={() => setViewer(null)}
+        >
+          <div
+            className="relative bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-3xl flex flex-col"
+            style={{ height: '85vh' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 dark:border-slate-700 shrink-0">
+              <p className="font-semibold text-slate-900 dark:text-white text-sm">{viewer.label}</p>
+              <div className="flex items-center gap-2">
+                <a
+                  href={viewer.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                  title="Buka di tab baru"
+                >
+                  <ExternalLink size={16} />
+                </a>
+                <button
+                  onClick={() => setViewer(null)}
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+            </div>
+            <div className="flex-1 overflow-auto flex items-center justify-center bg-slate-50 dark:bg-slate-800 rounded-b-2xl p-4">
+              <img
+                src={viewer.url}
+                alt={viewer.label}
+                className="max-w-full max-h-full object-contain rounded-lg"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
