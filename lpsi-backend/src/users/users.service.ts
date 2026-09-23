@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { v4 as uuidv4 } from 'uuid';
 import type { User } from '@prisma/client';
@@ -61,6 +61,23 @@ export class UsersService {
       data: { resetRequested: false, resetToken: null },
     });
     return { statusCode: 200, message: 'Permintaan reset password ditolak.' };
+  }
+
+  async deleteUser(id: number) {
+    const user = await this.prisma.user.findUnique({ where: { id } });
+    if (!user) throw new NotFoundException('User tidak ditemukan');
+    if (user.role !== 'PEMOHON')
+      throw new BadRequestException('Hanya akun pemohon yang dapat dihapus');
+
+    const requestCount = await this.prisma.labRequest.count({ where: { userId: id } });
+    if (requestCount > 0) {
+      throw new BadRequestException(
+        'Akun tidak dapat dihapus karena masih memiliki permohonan. Hapus permohonan terkait terlebih dahulu.',
+      );
+    }
+
+    await this.prisma.user.delete({ where: { id } });
+    return { statusCode: 200, message: `Akun ${user.nama} berhasil dihapus` };
   }
 
   async toggleActivate(id: number) {

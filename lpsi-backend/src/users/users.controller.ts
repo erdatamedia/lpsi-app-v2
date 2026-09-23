@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Patch, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import type { UpdateProfileDto } from './users.service';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
@@ -34,6 +34,13 @@ export class UsersController {
   @Patch('admin/:id/activate')
   toggleActivate(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.toggleActivate(id);
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles('ADMIN')
+  @Delete('admin/:id')
+  deleteUser(@Param('id', ParseIntPipe) id: number) {
+    return this.usersService.deleteUser(id);
   }
 
   @UseGuards(RolesGuard)

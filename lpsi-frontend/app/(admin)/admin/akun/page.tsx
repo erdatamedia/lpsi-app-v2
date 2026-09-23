@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import api from '@/lib/api';
-import { Users, CheckCircle2, XCircle, RefreshCw, KeyRound } from 'lucide-react';
+import { getErrorMessage } from '@/lib/error';
+import { Users, CheckCircle2, XCircle, RefreshCw, KeyRound, Trash2, Loader2 } from 'lucide-react';
 
 interface UserAccount {
   id: number;
@@ -19,6 +20,8 @@ export default function AdminAkunPage() {
   const [loading, setLoading] = useState(true);
   const [toggling, setToggling] = useState<number | null>(null);
   const [resetting, setResetting] = useState<number | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<UserAccount | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   async function fetchUsers() {
     try {
@@ -70,6 +73,21 @@ export default function AdminAkunPage() {
       toast.error('Gagal menolak reset password');
     } finally {
       setResetting(null);
+    }
+  }
+
+  async function handleDelete() {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    try {
+      const res = await api.delete(`/users/admin/${deleteTarget.id}`);
+      toast.success(res.data.message);
+      setUsers(prev => prev.filter(u => u.id !== deleteTarget.id));
+      setDeleteTarget(null);
+    } catch (err) {
+      toast.error(getErrorMessage(err));
+    } finally {
+      setDeleting(false);
     }
   }
 
@@ -199,18 +217,27 @@ export default function AdminAkunPage() {
                       <span className="text-xs text-slate-400">—</span>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-center">
-                    <button
-                      onClick={() => handleToggle(user)}
-                      disabled={toggling === user.id}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors disabled:opacity-50 ${
-                        user.isActive
-                          ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50'
-                          : 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-900/50'
-                      }`}
-                    >
-                      {toggling === user.id ? '...' : user.isActive ? 'Nonaktifkan' : 'Aktifkan'}
-                    </button>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center justify-center gap-1.5">
+                      <button
+                        onClick={() => handleToggle(user)}
+                        disabled={toggling === user.id}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors disabled:opacity-50 ${
+                          user.isActive
+                            ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50'
+                            : 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-900/50'
+                        }`}
+                      >
+                        {toggling === user.id ? '...' : user.isActive ? 'Nonaktifkan' : 'Aktifkan'}
+                      </button>
+                      <button
+                        onClick={() => setDeleteTarget(user)}
+                        title="Hapus akun"
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -218,6 +245,41 @@ export default function AdminAkunPage() {
           </table>
         )}
       </div>
+
+      {/* Dialog Konfirmasi Hapus Akun */}
+      {deleteTarget && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+          onClick={() => !deleting && setDeleteTarget(null)}
+        >
+          <div
+            className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-sm p-5"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="font-bold text-slate-900 dark:text-white">Hapus Akun?</h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1.5">
+              Akun <strong>{deleteTarget.nama}</strong> ({deleteTarget.email}) akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.
+            </p>
+            <div className="flex justify-end gap-2 mt-5">
+              <button
+                onClick={() => setDeleteTarget(null)}
+                disabled={deleting}
+                className="px-3.5 py-2 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors disabled:opacity-50"
+              >
+                Batal
+              </button>
+              <button
+                onClick={handleDelete}
+                disabled={deleting}
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-medium bg-red-600 hover:bg-red-700 text-white transition-colors disabled:opacity-50"
+              >
+                {deleting && <Loader2 size={13} className="animate-spin" />}
+                {deleting ? 'Menghapus...' : 'Hapus Akun'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
