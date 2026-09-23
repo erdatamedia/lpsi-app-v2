@@ -1,0 +1,64 @@
+import { ArticleLayout } from '@/components/ArticleLayout'
+
+export const metadata = {
+  title: 'Aplikasi Bermasalah? Coba Ini Dulu',
+}
+
+<ArticleLayout slug="troubleshooting">
+
+# Aplikasi Bermasalah? Coba Ini Dulu
+
+Sebelum menghubungi support, coba langkah-langkah berikut.
+
+## Halaman Tidak Bisa Dibuka
+
+- Muat ulang (refresh) halaman.
+- Pastikan koneksi internet Anda stabil.
+- Coba buka di jendela penyamaran (incognito) untuk mengecek apakah masalah dari cache browser.
+
+## Tidak Bisa Masuk (Login)
+
+- Pastikan email dan kata sandi sudah benar.
+- Klik **Lupa password?** di halaman login, lalu masukkan email akun Anda.
+
+![Halaman login SIPUJA dengan link Lupa password](/images/troubleshooting/login-lupa-password.png)
+
+- Reset password **tidak dilakukan otomatis** — admin akan memverifikasi permintaan Anda terlebih dahulu sebelum reset password diaktifkan. Jadi Anda tidak akan langsung menerima email/link reset setelah mengirim permintaan.
+
+![Halaman lupa password yang menjelaskan proses verifikasi admin](/images/troubleshooting/lupa-password-verifikasi.png)
+
+- Jika sudah menunggu cukup lama dan belum ada perubahan, hubungi tim support untuk mempercepat verifikasi.
+
+## Status Permohonan Tidak Berubah-Ubah
+
+- SIPUJA mengharuskan **setiap tahapan** dalam proses permohonan diverifikasi atau diproses secara manual oleh admin — mulai dari verifikasi sampel, penerbitan e-billing, konfirmasi pembayaran, upload LHP, hingga pengiriman dokumen fisik. Jadi wajar bila status permohonan Anda belum berubah dalam waktu tertentu, karena sedang menunggu tindakan admin di tahap tersebut.
+- Anda bisa memantau riwayat perubahan status secara lengkap di tab **Riwayat** pada halaman detail permohonan.
+
+![Tab Riwayat menampilkan log perubahan status dengan tanggal dan waktu](/images/troubleshooting/riwayat-status.png)
+
+- Anda juga akan mendapat catatan di halaman **Notifikasi** setiap kali status permohonan diperbarui.
+- Jika status belum berubah dalam waktu yang cukup lama, hubungi tim support untuk menanyakan progres permohonan Anda.
+
+## Tidak Bisa Download LHP (Laporan Hasil Pengujian)
+
+- Tombol **Download LHP** baru bisa digunakan setelah Anda **mengisi Survei Kepuasan Masyarakat (SKM)** terlebih dahulu — ini adalah syarat wajib sebelum LHP dapat diunduh.
+
+![Tab Analisa & LHP menampilkan tombol Download LHP dan syarat pengisian SKM](/images/troubleshooting/lhp-download-skm.png)
+
+- Jika Anda mengklik tombol Download LHP namun tidak terjadi apa-apa (atau muncul permintaan mengisi survei), silakan isi SKM yang tersedia di halaman tersebut, lalu coba download kembali.
+- Jika Anda memilih opsi **LHP fisik dikirim**, biaya pengiriman akan dibebankan dengan sistem pembayaran COD (Cash on Delivery), dan status pengiriman dapat dipantau melalui **Nomor Resi** yang diinput oleh admin.
+
+## Bukti Pembayaran Sudah Diupload Tapi Status Belum Berubah
+
+- Setelah Anda mengunggah bukti pembayaran, status permohonan akan menunjukkan **"Menunggu konfirmasi admin"** — ini bukan tanda gagal, melainkan proses normal karena admin perlu memverifikasi bukti pembayaran Anda secara manual.
+- Setelah dikonfirmasi oleh admin, status akan otomatis berubah menjadi **"Lunas"**, dan proses pengujian sampel Anda akan dilanjutkan (status berubah menjadi **"On Progress"**).
+
+![Tab Pembayaran menampilkan e-billing dan status Lunas](/images/troubleshooting/pembayaran-lunas.png)
+
+- Jika sudah menunggu cukup lama tanpa perubahan status, hubungi tim support dan sertakan nomor permohonan Anda sebagai bukti.
+
+## Masih Belum Berhasil?
+
+Jika masalah masih berlanjut, silakan hubungi admin laboratorium untuk mendapatkan bantuan lebih lanjut.
+
+</ArticleLayout>

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, X, ExternalLink } from 'lucide-react';
+import { ArrowRight, X, ExternalLink, HelpCircle } from 'lucide-react';
 import { Slideshow } from '@/components/Slideshow';
 import { ThemeToggle } from '@/components/ThemeToggle';
 
@@ -78,6 +78,12 @@ export default function HomePage() {
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <Button asChild variant="ghost" size="sm">
+            <Link href="/help" className="flex items-center gap-1.5">
+              <HelpCircle size={15} />
+              <span className="hidden sm:inline">Pusat Bantuan</span>
+            </Link>
+          </Button>
           <ThemeToggle />
           <Button asChild variant="ghost" size="sm"><Link href="/login">Masuk</Link></Button>
           <Button asChild size="sm" className="bg-blue-600 hover:bg-blue-700 text-white"><Link href="/register">Daftar</Link></Button>
